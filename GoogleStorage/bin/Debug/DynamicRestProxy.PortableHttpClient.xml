@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DynamicRestProxy.PortableHttpClient</name>
+    </assembly>
+    <members>
+        <member name="T:DynamicRestProxy.PortableHttpClient.ContentInfo">
+            <summary>
+            Holder class for a content object and meta data about that object to be set in
+            content headers if provided
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.ContentInfo.#ctor(System.Object,System.String)">
+            <summary>
+            ctor
+            </summary>
+            <param name="content"></param>
+            <param name="mimeType"></param>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.ContentInfo.ContentHeaders">
+            <summary>
+            Additional content headers
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.ContentInfo.Content">
+            <summary>
+            The content to send
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.ContentInfo.MimeType">
+            <summary>
+            The MIME type of the content object
+            </summary>
+        </member>
+        <member name="T:DynamicRestProxy.PortableHttpClient.DynamicRestClientDefaults">
+            <summary>
+            Default values that will be added all all requests
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.DynamicRestClientDefaults.#ctor">
+            <summary>
+            ctor
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.DynamicRestClientDefaults.DefaultParameters">
+            <summary>
+            Default paramter values
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.DynamicRestClientDefaults.DefaultHeaders">
+            <summary>
+            Default request header values
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.DynamicRestClientDefaults.AuthToken">
+            <summary>
+            Auth token to add to all requests
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.DynamicRestClientDefaults.AuthScheme">
+            <summary>
+            The Auth scheme used for AuthToken
+            </summary>
+        </member>
+        <member name="T:DynamicRestProxy.PortableHttpClient.HttpClientProxy">
+            <summary>
+            Proxy wrapper around an HttpClient instance
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.HttpClientProxy.#ctor(System.Net.Http.HttpClient)">
+            <summary>
+            ctor
+            </summary>
+            <param name="client">The HttpClient to wrap</param>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.HttpClientProxy.CreateProxyNode(DynamicRestProxy.RestProxy,System.String)">
+            <summary>
+            <see cref="M:DynamicRestProxy.RestProxy.CreateProxyNode(DynamicRestProxy.RestProxy,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.HttpClientProxy.CreateVerbAsyncTask(System.String,System.Collections.Generic.IEnumerable{System.Object},System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            <see cref="M:DynamicRestProxy.RestProxy.CreateVerbAsyncTask(System.String,System.Collections.Generic.IEnumerable{System.Object},System.Collections.Generic.IDictionary{System.String,System.Object})"/>
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.HttpClientProxy.BaseUrl">
+            <summary>
+            <see cref="P:DynamicRestProxy.RestProxy.BaseUrl"/>
+            </summary>
+        </member>
+        <member name="T:DynamicRestProxy.PortableHttpClient.DynamicRestClient">
+            <summary>
+            A rest client that uses dynamic objects for invocation and result values
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.DynamicRestClient.#ctor(System.String,DynamicRestProxy.PortableHttpClient.DynamicRestClientDefaults,System.Func{System.Net.Http.HttpRequestMessage,System.Threading.CancellationToken,System.Threading.Tasks.Task})">
+            <summary>
+            ctor
+            </summary>
+            <param name="baseUrl">The root url for all requests</param>
+            <param name="defaults">Default values to add to all requests</param>
+            <param name="configure">A callback function that will be called just before any request is sent</param>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.DynamicRestClient.CreateProxyNode(DynamicRestProxy.RestProxy,System.String)">
+            <summary>
+            <see cref="M:DynamicRestProxy.RestProxy.CreateProxyNode(DynamicRestProxy.RestProxy,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.DynamicRestClient.CreateVerbAsyncTask(System.String,System.Collections.Generic.IEnumerable{System.Object},System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            <see cref="M:DynamicRestProxy.RestProxy.CreateVerbAsyncTask(System.String,System.Collections.Generic.IEnumerable{System.Object},System.Collections.Generic.IDictionary{System.String,System.Object})"/>
+            </summary>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.DynamicRestClient.BaseUrl">
+            <summary>
+            <see cref="P:DynamicRestProxy.RestProxy.BaseUrl"/>
+            </summary>
+        </member>
+        <member name="T:DynamicRestProxy.PortableHttpClient.PostUrlParam">
+            <summary>
+            By default POST parameters will be form encoded.
+            Use this to force the request to have a particular parameter encoded on the url query
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.PostUrlParam.#ctor(System.Object)">
+            <summary>
+            ctor
+            </summary>
+            <param name="v">The param value</param>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.PostUrlParam.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+            <returns>string representation of Value</returns>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.PostUrlParam.GetHashCode">
+            <summary>
+            <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+            <returns>the hascode of Value</returns>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.PostUrlParam.Equals(System.Object)">
+            <summary>
+            <see cref="M:System.Object.Equals(System.Object)"/>
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="P:DynamicRestProxy.PortableHttpClient.PostUrlParam.Value">
+            <summary>
+            The paramter's value
+            </summary>
+        </member>
+        <member name="T:DynamicRestProxy.PortableHttpClient.StreamInfo">
+            <summary>
+            Wrapper class for a stream that relates the stream to meta-data (MIME type)
+            about the stream so meta data can be added to content headers
+            </summary>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.StreamInfo.#ctor(System.IO.Stream,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="stream">stream</param>
+            <param name="mimeType">MIME type</param>
+        </member>
+        <member name="M:DynamicRestProxy.PortableHttpClient.StreamInfo.Dispose">
+            <summary>
+            Disposes the underlying stream when called
+            </summary>
+        </member>
+    </members>
+</doc>

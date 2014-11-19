@@ -1,0 +1,23 @@
+﻿Installing assembly 'D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.dll'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.dll
+   logfile = D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.InstallLog
+Rolling back assembly 'D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.dll'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.dll
+   logfile = D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.InstallLog
+An exception occurred during the Rollback phase of the GoogleStorage.GoogleStorageCmdlets installer.
+System.UnauthorizedAccessException: Access to the registry key 'HKEY_LOCAL_MACHINE\Software\Microsoft\PowerShell\1\PowerShellSnapIns' is denied.
+An exception occurred during the Rollback phase of the installation. This exception will be ignored and the rollback will continue. However, the machine might not fully revert to its initial state after the rollback is complete.
+Installing assembly 'D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.dll'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.dll
+   logfile = D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.InstallLog
+Committing assembly 'D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.dll'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.dll
+   logfile = D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.InstallLog

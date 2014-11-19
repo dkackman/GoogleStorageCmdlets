@@ -1,0 +1,31 @@
+﻿
+Running a transacted installation.
+
+Beginning the Install phase of the installation.
+See the contents of the log file for the D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.dll assembly's progress.
+The file is located at D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.InstallLog.
+
+An exception occurred during the Install phase.
+System.UnauthorizedAccessException: Access to the registry key 'HKEY_LOCAL_MACHINE\Software\Microsoft\PowerShell\1\PowerShellSnapIns\GoogleStorage' is denied.
+
+The Rollback phase of the installation is beginning.
+See the contents of the log file for the D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.dll assembly's progress.
+The file is located at D:\users\don\documents\visual studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\googlestorage.InstallLog.
+
+The Rollback phase completed successfully.
+
+The transacted install has completed.
+
+Running a transacted installation.
+
+Beginning the Install phase of the installation.
+See the contents of the log file for the D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.dll assembly's progress.
+The file is located at D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.InstallLog.
+
+The Install phase completed successfully, and the Commit phase is beginning.
+See the contents of the log file for the D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.dll assembly's progress.
+The file is located at D:\Users\Don\Documents\Visual Studio 2013\Projects\GoogleStorage\GoogleStorage\bin\Debug\GoogleStorage.InstallLog.
+
+The Commit phase completed successfully.
+
+The transacted install has completed.
