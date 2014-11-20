@@ -4,4 +4,4 @@
 	[Parameter()] $TargetDir
 )
 
-Copy GoogleStorage.dll .\GoogleStorage -Force -Verbose
+Copy *.dll .\GoogleStorage -Force -Verbose
