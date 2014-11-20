@@ -34,6 +34,7 @@ namespace GoogleStorage
                 return storage.FileExists(name);
             }
         }
+
         public dynamic RetrieveObject(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -81,7 +82,7 @@ namespace GoogleStorage
             }
         }
 
-        private IsolatedStorageFile GetStorage()
+        private static IsolatedStorageFile GetStorage()
         {
             return IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
         }
