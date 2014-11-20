@@ -15,8 +15,7 @@ Write-Host
 # Load the module.
 #$env:PSModulePath = ".;$env:PSModulePath"
 $env:PSModulePath = (Resolve-Path .).Path + ";" + $env:PSModulePath
-# Import-Module GoogleStorage -Verbose
-Add-PSSnapIn GoogleStorage
+Import-Module GoogleStorage -Verbose
 # Set-GoogleStorageProject poop
 # Happy debugging :-)
 

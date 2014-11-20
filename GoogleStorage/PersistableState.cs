@@ -1,31 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Dynamic;
 using System.Management.Automation;
 
 namespace GoogleStorage
 {
     static class PersistableState
     {
-        public static object GetPersistedVariableValue(this PSCmdlet cmdlet, string name, object defaultValue = null)
+        public static dynamic GetPersistedVariableValue(this PSCmdlet cmdlet, string name, object defaultValue = null)
         {
-            // if the variable isn't in session state - see if it is persted and add it to the session
-            if (cmdlet.GetVariableValue(name, null) == null)
-            {
-                var storage = new PersistantStorage();
-                if (storage.ObjectExists(name))
-                {
-                    var o = storage.RetrieveObject(name);
-                    cmdlet.SessionState.PSVariable.Set(name, o);
-                    cmdlet.WriteVerbose(name + " retreived from presistant storage.");
-                }
-            }
-            return cmdlet.GetVariableValue(name, defaultValue);
+            return cmdlet.GetPersistedVariableValue<dynamic>(name, o => o, defaultValue);
         }
-        public static object GetPersistedVariableValue<T>(this PSCmdlet cmdlet, string name, Func<dynamic, T> convert, object defaultValue = null)
+
+        public static T GetPersistedVariableValue<T>(this PSCmdlet cmdlet, string name, Func<dynamic, T> convert, object defaultValue = null)
         {
             // if the variable isn't in session state - see if it is persted and add it to the session
             if (cmdlet.GetVariableValue(name, null) == null)
@@ -38,7 +23,7 @@ namespace GoogleStorage
                     cmdlet.WriteVerbose(name + " retreived from presistant storage.");
                 }
             }
-            return cmdlet.GetVariableValue(name, defaultValue);
+            return (T)cmdlet.GetVariableValue(name, defaultValue);
         }
 
         public static void SetPersistedVariableValue(this PSCmdlet cmdlet, string name, object value, bool persist = true)

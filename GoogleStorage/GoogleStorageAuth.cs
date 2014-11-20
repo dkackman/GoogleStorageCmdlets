@@ -9,27 +9,34 @@ using System.Security;
 namespace GoogleStorage
 {
     [Cmdlet(VerbsSecurity.Grant, "GoogleStorageAuth")]
-    class GrantGoogleStorageAuth : PSCmdlet
+    public class GrantGoogleStorageAuth : PSCmdlet
     {
-        public bool Persist { get; set; }
+        public GrantGoogleStorageAuth()
+        {
+            Persist = false;
+            ShowBrowser = false;
+        }
 
-        public bool ShowBrowser { get; set; }
+        [Parameter(Mandatory = false)]
+        public SwitchParameter Persist { get; set; }
+
+        [Parameter(Mandatory = false)]
+        public SwitchParameter ShowBrowser { get; set; }
 
         protected override void BeginProcessing()
         {
-            
+
         }
 
         protected override void ProcessRecord()
         {
-        //    this.Host.UI.Write
             var storage = new PersistantStorage();
-            
+
         }
     }
 
     [Cmdlet(VerbsSecurity.Revoke, "GoogleStorageAuth")]
-    class RevokeGoogleStorageAuth : PSCmdlet
+    public class RevokeGoogleStorageAuth : PSCmdlet
     {
         protected override void ProcessRecord()
         {

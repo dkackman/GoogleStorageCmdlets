@@ -24,7 +24,7 @@ namespace GoogleStorage
         public bool Persist { get; set; }
 
         [Parameter(Mandatory = true, ParameterSetName = "Prompt")]
-        public bool Prompt
+        public SwitchParameter Prompt
         {
             get { return _prompt; }
             set { _prompt = value; }
