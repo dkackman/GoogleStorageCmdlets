@@ -1,4 +1,4 @@
-GoogleStorageCmdLet
+GoogleStorageCmdlets
 ===================
 
 A PowerShell CmdLet for interacting with the [Google Storage API](https://cloud.google.com/storage/docs/json_api/) (similar in intent to their [gsutil](https://cloud.google.com/storage/docs/gsutil]) python utility)
