@@ -66,6 +66,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="GoogleOAuth2.cs" />
     <Compile Include="GoogleStorageAuth.cs" />
+    <Compile Include="GoogleStorageAuthenticatedCmdlet.cs" />
     <Compile Include="PersistableState.cs" />
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="GoogleStorageProject.cs" />

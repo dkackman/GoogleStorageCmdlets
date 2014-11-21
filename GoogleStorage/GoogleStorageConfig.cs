@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Management.Automation;
 using System.Security;
-using System.Dynamic;
 
 namespace GoogleStorage
 {
@@ -73,7 +72,7 @@ namespace GoogleStorage
                             new InvalidOperationException("Google Storage config not set. Call Set-GoogleStorageConfig first"),
                             "ShowGoogleStorageConfig",
                             ErrorCategory.ObjectNotFound,
-                            "GoogleCredentials"));
+                            "config"));
                 }
                 else
                 {
@@ -86,7 +85,7 @@ namespace GoogleStorage
                         e,
                         "ShowGoogleStorageConfig",
                         ErrorCategory.NotSpecified,
-                        "GoogleCredentials"));
+                        "config"));
             }
         }
     }
