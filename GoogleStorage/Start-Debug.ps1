@@ -17,7 +17,9 @@ Write-Host
 $env:PSModulePath = (Resolve-Path .).Path + ";" + $env:PSModulePath
 Import-Module GoogleStorage 
 
-Get-GoogleStorageConfig
+#Grant-GoogleStorageAuth -ShowBrowser -Persist
+
+#Get-GoogleStorageConfig
 #Get-GoogleStorageBucket -bucket uspto-pair -NoAuth -ListContents
 # Set-GoogleStorageProject poop
 # Happy debugging :-)

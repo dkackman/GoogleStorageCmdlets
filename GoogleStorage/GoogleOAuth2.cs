@@ -29,44 +29,25 @@ namespace GoogleStorage
             _scope = scope;
         }
 
-        public async Task<string> Authenticate(PSCredential credential)
+        public async Task<dynamic> StartAuthentication(dynamic config)
         {
-            return await Authenticate(credential, CancellationToken.None);
+            return await StartAuthentication(config, CancellationToken.None);
         }
 
-        public async Task<string> Authenticate(PSCredential credential, CancellationToken cancelToken)
+        public async Task<dynamic> StartAuthentication(dynamic config, CancellationToken cancelToken)
         {
-            dynamic access = await GetNewAccessToken(credential, cancelToken);
-            StoreAccess(access);
+            dynamic google = new DynamicRestClient("https://accounts.google.com/o/oauth2/");
+            var response = await google.device.code.post(cancelToken, client_id: config.ClientId, scope: _scope);
 
-            return access.access_token;
+            return response;
         }
 
-        public async Task<string> GetAccessToken(dynamic access, PSCredential credential, CancellationToken cancelToken)
+        public async Task<dynamic> RefreshAccessToken(dynamic access, dynamic config, CancellationToken cancelToken)
         {
-            Debug.Assert((object)access != null);
-
-            if (DateTime.UtcNow >= access.expiry)
-            {
-                access = await RefreshAccessToken(access, credential, cancelToken);
-                StoreAccess(access);
-            }
-            return access.access_token;
-        }
-
-        private void StoreAccess(dynamic access)
-        {
-            access.expiry = DateTime.UtcNow.Add(TimeSpan.FromSeconds(access.expires_in));
-            _storage.StoreObject(_scope.GetHashCode() + ".google.auth.json", access);
-        }
-
-        private async Task<dynamic> RefreshAccessToken(dynamic access, PSCredential credential, CancellationToken cancelToken)
-        {
-            string clientId = credential.UserName;
-            SecureString clientSecret = credential.Password;
+            SecureString clientSecret = config.ClientSecret;
 
             dynamic google = new DynamicRestClient("https://accounts.google.com/o/oauth2/");
-            var response = await google.token.post(cancelToken, client_id: clientId, client_secret: clientSecret.ToUnsecureString(), refresh_token: access.refresh_token, grant_type: "refresh_token");
+            var response = await google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), refresh_token: access.refresh_token, grant_type: "refresh_token");
 
             response.refresh_token = access.refresh_token; // the new access token doesn't have a new refresh token so move our current one here for long term storage
             return response;
@@ -80,36 +61,21 @@ namespace GoogleStorage
         /// This should only need to be done once because the access token will be stored and refreshed for future test runs
         /// </summary>
         /// <returns></returns>
-        private async Task<dynamic> GetNewAccessToken(PSCredential credential, CancellationToken cancelToken)
+        public async Task<dynamic> WaitForConfirmation(dynamic response, dynamic config, CancellationToken cancelToken)
         {
-            string clientId = credential.UserName;
-            SecureString clientSecret = credential.Password;
-
-            dynamic google = new DynamicRestClient("https://accounts.google.com/o/oauth2/");
-            var response = await google.device.code.post(cancelToken, client_id: clientId, scope: _scope);
-
-            Debug.WriteLine((string)response.user_code);
-
-            Console.WriteLine("Requested permissions are:");
-            Console.WriteLine(_scope);
-            Console.WriteLine("");
-            Console.WriteLine("Navigate to {0} in a web browser", response.verification_url);
-            Console.WriteLine("Enter this code to authorize access: " + response.user_code);
-            Console.WriteLine("");
-
-            // this requires user permission - open a broswer - enter the user_code which is now in the clipboard
-            Process.Start((string)response.verification_url);
+            SecureString clientSecret = config.ClientSecret;
 
             long expiration = response.expires_in;
             long interval = response.interval;
             long time = interval;
 
+            dynamic google = new DynamicRestClient("https://accounts.google.com/o/oauth2/");
             // we are using the device flow so enter the code in the browser
             // here poll google for success
             while (time < expiration)
             {
                 Thread.Sleep((int)interval * 1000);
-                dynamic tokenResonse = await google.token.post(cancelToken, client_id: clientId, client_secret: clientSecret.ToUnsecureString(), code: response.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
+                dynamic tokenResonse = await google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), code: response.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
                 try
                 {
                     if (tokenResonse.access_token != null)

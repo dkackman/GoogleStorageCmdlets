@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Dynamic;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Threading;
 using System.Management.Automation;
 
 namespace GoogleStorage
 {
     public abstract class GoogleStorageCmdlet : PSCmdlet
     {
+        private CancellationTokenSource _cancelTokenSource;
+
         protected string GetProjectName(string propertyValue)
         {
             if(!string.IsNullOrEmpty(propertyValue))
@@ -62,7 +62,6 @@ namespace GoogleStorage
                 {
                     var o = storage.RetrieveObject(name);
                     SessionState.PSVariable.Set(name, convert(o));
-                    WriteVerbose(name + " retreived from presistant storage.");
                 }
             }
             return (T)GetVariableValue(name, defaultValue);
@@ -76,7 +75,6 @@ namespace GoogleStorage
             {
                 var storage = new PersistantStorage();
                 storage.StoreObject(name, value);
-                WriteVerbose(name + " stored for future sessions.");
             }
         }
 
@@ -86,7 +84,6 @@ namespace GoogleStorage
 
             var storage = new PersistantStorage();
             storage.RemoveObject(name);
-            WriteVerbose(name + " cleared from session and persistant storage.");
         }
 
         protected bool AssertVariableValue(string name, string message)
@@ -98,6 +95,64 @@ namespace GoogleStorage
             }
 
             return true;
+        }
+
+        protected CancellationToken GetCancellationToken()
+        {
+            if (_cancelTokenSource == null)
+            {
+                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccsing was not called.");
+            }
+
+            return _cancelTokenSource.Token;
+        }
+
+        protected void Cancel()
+        {
+            if (_cancelTokenSource == null)
+            {
+                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccsing was not called.");
+            }
+
+            if (!_cancelTokenSource.IsCancellationRequested)
+            {
+                _cancelTokenSource.Cancel();
+            }
+        }
+
+        protected override void BeginProcessing()
+        {
+            Debug.Assert(_cancelTokenSource == null);
+            _cancelTokenSource = new CancellationTokenSource();
+        }
+
+        protected override void EndProcessing()
+        {
+            try
+            {
+                if (_cancelTokenSource != null)
+                {
+                    _cancelTokenSource.Dispose();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Assert(false, e.Message);
+            }
+        }
+
+        protected override void StopProcessing()
+        {
+            WriteVerbose("Cancelling...");
+            Cancel();
+        }
+
+        protected void WriteAggregateException(AggregateException e)
+        {
+            foreach (var error in e.InnerExceptions)
+            {
+                WriteError(new ErrorRecord(error, error.Message, ErrorCategory.NotSpecified, null));
+            }
         }
     }
 }

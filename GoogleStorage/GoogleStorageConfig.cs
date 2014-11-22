@@ -8,11 +8,6 @@ namespace GoogleStorage
     [Cmdlet(VerbsCommon.Set, "GoogleStorageConfig")]
     public class SetGoogleStorageConfig : GoogleStorageCmdlet
     {
-        public SetGoogleStorageConfig()
-        {
-            Persist = true;
-        }
-
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string ClientId { get; set; }
 

@@ -11,10 +11,11 @@ namespace GoogleStorage
 {
     public abstract class GoogleStorageAuthenticatedCmdlet : GoogleStorageCmdlet
     {
-        private CancellationTokenSource _cancelTokenSource;
-
         [Parameter(Mandatory = false)]
         public SwitchParameter NoAuth { get; set; }
+
+        [Parameter(Mandatory = false)]
+        public SwitchParameter Persist { get; set; }
 
         protected DynamicRestClient CreateClient()
         {
@@ -25,10 +26,11 @@ namespace GoogleStorage
 
             return new DynamicRestClient("https://www.googleapis.com/", null, async (request, cancelToken) =>
             {
-                var authToken = await GetAccessToken(); 
+                var authToken = await GetAccessToken();
                 request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", authToken);
             });
         }
+
 
         protected async Task<string> GetAccessToken()
         {
@@ -39,64 +41,20 @@ namespace GoogleStorage
                 return "";
             }
 
-            var auth = this.GetPersistedVariableValue<dynamic>("auth", o => o);
-            if (auth == null)
+            var access = this.GetPersistedVariableValue<dynamic>("access", o => o);
+            if (access == null)
             {
                 throw new AccessViolationException("Access token not set. Call Grant-GoogleStorageAuth first");
             }
-            
-            var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
-            return await oauth.GetAccessToken(auth, GetConfig(), GetCancellationToken());
-        }
 
-        protected CancellationToken GetCancellationToken()
-        {
-            if (_cancelTokenSource == null)
+            if (DateTime.UtcNow >= access.expiry)
             {
-                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccsing was not called.");
+                var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
+                access = await oauth.RefreshAccessToken(access, GetConfig(), GetCancellationToken());
+                SetPersistedVariableValue("access", access, Persist);
             }
 
-            return _cancelTokenSource.Token;
-        }
-        
-        protected void Cancel()
-        {
-            if (_cancelTokenSource == null)
-            {
-                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccsing was not called.");
-            }
-
-            if (!_cancelTokenSource.IsCancellationRequested)
-            {
-                _cancelTokenSource.Cancel();
-            }
-        }
-
-        protected override void BeginProcessing()
-        {
-            Debug.Assert(_cancelTokenSource == null);
-            _cancelTokenSource = new CancellationTokenSource();
-        }
-
-        protected override void EndProcessing()
-        {
-            try
-            {
-                if (_cancelTokenSource != null)
-                {
-                    _cancelTokenSource.Dispose();
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Assert(false, e.Message);
-            }
-        }
-
-        protected override void StopProcessing()
-        {
-            WriteVerbose("Cancelling...");
-            Cancel();
+            return access.access_token;
         }
     }
 }

@@ -45,10 +45,7 @@ namespace GoogleStorage
             }
             catch (AggregateException e)
             {
-                foreach (var error in e.InnerExceptions)
-                {
-                    WriteError(new ErrorRecord(error, error.Message, ErrorCategory.NotSpecified, null));
-                }
+                WriteAggregateException(e);
             }
             catch (Exception e)
             {
