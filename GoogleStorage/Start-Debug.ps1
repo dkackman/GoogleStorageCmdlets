@@ -20,7 +20,8 @@ Import-Module GoogleStorage
 #Grant-GoogleStorageAuth -ShowBrowser -Persist
 
 #Get-GoogleStorageConfig
-#Get-GoogleStorageBucket -bucket uspto-pair -NoAuth -ListContents
+#Get-GoogleStorageBucket -bucket uspto-pair -NoAuth -ListContents | out-host -paging
+Get-GoogleStorageBuckets -Project direct-link-612 
 # Set-GoogleStorageProject poop
 # Happy debugging :-)
 

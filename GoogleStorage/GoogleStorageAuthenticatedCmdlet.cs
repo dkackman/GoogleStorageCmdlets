@@ -41,7 +41,7 @@ namespace GoogleStorage
                 return "";
             }
 
-            var access = this.GetPersistedVariableValue<dynamic>("access", o => o);
+            var access = this.GetPersistedVariableValue<dynamic>("auth", o => o);
             if (access == null)
             {
                 throw new AccessViolationException("Access token not set. Call Grant-GoogleStorageAuth first");

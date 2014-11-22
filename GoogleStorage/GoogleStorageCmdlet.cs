@@ -12,18 +12,15 @@ namespace GoogleStorage
 
         protected string GetProjectName(string propertyValue)
         {
-            if(!string.IsNullOrEmpty(propertyValue))
+            // a project set at a cmlet property will take precendence over the config
+            if (!string.IsNullOrEmpty(propertyValue))
             {
                 return propertyValue;
             }
 
-            dynamic project = this.GetPersistedVariableValue("Project", null);
-            if(project != null)
-            {
-                return project.ProjectName;
-            }
+            dynamic config = GetConfig();
 
-            return "";
+            return config.Project;
         }
 
         protected dynamic GetConfig()

@@ -18,9 +18,6 @@ namespace GoogleStorage
         [Parameter(Mandatory = false)]
         public SwitchParameter ListContents { get; set; }
 
-        [Parameter(Mandatory = false)]
-        public string ProjectName { get; set; }
-
         protected override void ProcessRecord()
         {
             try
@@ -42,6 +39,12 @@ namespace GoogleStorage
                     dynamic result = t.Result;
                     WriteObject(result);
                 }
+            }
+            catch (HaltCommandException)
+            {
+            }
+            catch (PipelineStoppedException)
+            {
             }
             catch (AggregateException e)
             {
@@ -67,13 +70,7 @@ namespace GoogleStorage
 
         private async Task<dynamic> GetBucketMetaData(dynamic endpoint)
         {
-            var project = GetProjectName(ProjectName);
-            if (string.IsNullOrEmpty(project))
-            {
-                return await endpoint.get(GetCancellationToken());
-            }
-
-            return await endpoint.get(GetCancellationToken(), project: project);
+            return await endpoint.get(GetCancellationToken());
         }
     }
 }
