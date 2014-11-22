@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Security;
 using System.Diagnostics;
 
 namespace GoogleStorage
@@ -53,7 +49,7 @@ namespace GoogleStorage
                 var access = confirmTask.Result;
 
                 access.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(response.expires_in);
-                SetPersistedVariableValue("auth", access, Persist);
+                SetPersistedVariableValue("access", access, Persist);
                 WriteVerbose("Authorized");
             }
             catch (AggregateException e)
@@ -86,7 +82,7 @@ namespace GoogleStorage
     {
         protected override void ProcessRecord()
         {
-            ClearPersistedVariableValue("auth");
+            ClearPersistedVariableValue("access");
         }
     }
 }

@@ -26,13 +26,13 @@ namespace GoogleStorage
 
             return new DynamicRestClient("https://www.googleapis.com/", null, async (request, cancelToken) =>
             {
-                var authToken = await GetAccessToken();
+                var authToken = await GetAccessToken(cancelToken);
                 request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", authToken);
             });
         }
 
 
-        protected async Task<string> GetAccessToken()
+        protected async Task<string> GetAccessToken(CancellationToken cancelToken)
         {
             Debug.Assert(!NoAuth, "You should really check NoAuth prior to calling this method");
 
@@ -41,7 +41,7 @@ namespace GoogleStorage
                 return "";
             }
 
-            var access = this.GetPersistedVariableValue<dynamic>("auth", o => o);
+            var access = this.GetPersistedVariableValue<dynamic>("access", o => o);
             if (access == null)
             {
                 throw new AccessViolationException("Access token not set. Call Grant-GoogleStorageAuth first");
@@ -50,7 +50,7 @@ namespace GoogleStorage
             if (DateTime.UtcNow >= access.expiry)
             {
                 var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
-                access = await oauth.RefreshAccessToken(access, GetConfig(), GetCancellationToken());
+                access = await oauth.RefreshAccessToken(access, GetConfig(), cancelToken);
                 SetPersistedVariableValue("access", access, Persist);
             }
 
