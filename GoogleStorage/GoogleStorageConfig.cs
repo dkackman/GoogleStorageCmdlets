@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Management.Automation;
+using System.Dynamic;
 using System.Security;
 
 namespace GoogleStorage
@@ -10,46 +11,28 @@ namespace GoogleStorage
         public SetGoogleStorageConfig()
         {
             Persist = true;
-            _prompt = false;
         }
 
-        [Parameter(Mandatory = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "NoPrompt")]
+        [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string ClientId { get; set; }
 
-        [Parameter(Mandatory = true, ValueFromPipelineByPropertyName = true, ParameterSetName = "NoPrompt")]
-        public string ClientSecret { get; set; }
+        [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
+        public SecureString ClientSecret { get; set; }
 
-        [Parameter(Mandatory = false, ValueFromPipelineByPropertyName = true)]
-        public bool Persist { get; set; }
+        [Parameter(Mandatory = true, Position = 2, ValueFromPipelineByPropertyName = true)]
+        public string Project { get; set; }
 
-        [Parameter(Mandatory = true, ParameterSetName = "Prompt")]
-        public SwitchParameter Prompt
-        {
-            get { return _prompt; }
-            set { _prompt = value; }
-        }
-        private bool _prompt;
+        [Parameter(Mandatory = false)]
+        public SwitchParameter Persist { get; set; }
 
         protected override void ProcessRecord()
         {
-            PSCredential credential = null;
+            dynamic config = new ExpandoObject();
+            config.ClientId = ClientId;
+            config.ClientSecret = ClientSecret;
+            config.Project = Project;
 
-            if (_prompt)
-            {
-                credential = Host.UI.PromptForCredential("Enter Google Client Id and Secret", "Supply your Google Client Id as User name and Client Secret as Password", ClientId, ClientSecret, PSCredentialTypes.Generic, PSCredentialUIOptions.None);
-            }
-            else // use the CmdLet's paramters 
-            {
-                var password = new SecureString();
-                Array.ForEach(ClientSecret.ToCharArray(), password.AppendChar);
-                password.MakeReadOnly();
-                credential = new PSCredential(ClientId, password);
-            }
-
-            if (credential != null)
-            {
-                this.SetPersistedVariableValue("config", credential);
-            }
+            this.SetPersistedVariableValue("config", config, Persist);
         }
     }
 
@@ -60,23 +43,11 @@ namespace GoogleStorage
         {
             try
             {
-                var credential = this.GetPersistedVariableValue<PSCredential>("config", d =>
-                    {
-                        var encrypted = d.Password as string;
-                        return new PSCredential(d.UserName, encrypted.FromEncyptedString());
-                    }); 
+                var config = GetConfig();
 
-                if (credential == null)
+                if (config != null)
                 {
-                    WriteError(new ErrorRecord(
-                            new InvalidOperationException("Google Storage config not set. Call Set-GoogleStorageConfig first"),
-                            "GetGoogleStorageConfig",
-                            ErrorCategory.ObjectNotFound,
-                            "config"));
-                }
-                else
-                {
-                    WriteObject(GetVariableValue("config", null));
+                    WriteObject(config);
                 }
             }
             catch (Exception e)
@@ -97,7 +68,7 @@ namespace GoogleStorage
         {
             try
             {
-                this.ClearPersistedVariableValue("config"); 
+                this.ClearPersistedVariableValue("config");
             }
             catch (Exception e)
             {

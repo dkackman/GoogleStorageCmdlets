@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Dynamic;
 using System.Threading.Tasks;
 using System.Management.Automation;
 
@@ -9,20 +10,43 @@ namespace GoogleStorage
 {
     public abstract class GoogleStorageCmdlet : PSCmdlet
     {
-        protected PSCredential GetConfig()
+        protected string GetProjectName(string propertyValue)
         {
-            var credential = this.GetPersistedVariableValue<PSCredential>("config", d =>
+            if(!string.IsNullOrEmpty(propertyValue))
             {
-                var encrypted = d.Password as string;
-                return new PSCredential(d.UserName, encrypted.FromEncyptedString());
-            });
+                return propertyValue;
+            }
 
-            if (credential == null)
+            dynamic project = this.GetPersistedVariableValue("Project", null);
+            if(project != null)
+            {
+                return project.ProjectName;
+            }
+
+            return "";
+        }
+
+        protected dynamic GetConfig()
+        {
+            var config = this.GetPersistedVariableValue("config", d =>
+                {
+                    // convert the serialized encrypted string into an in memory securestring
+                    dynamic result = new ExpandoObject();
+                    result.ClientId = d.ClientId;
+                    result.ClientSecret = ((string)d.ClientSecret).FromEncyptedString();
+                    result.Project = d.Project;
+                    return result;
+                },
+                null);
+
+            if (config == null)
             {
                 throw new InvalidOperationException("Google Storage config not set. Call Set-GoogleStorageConfig first");
             }
-            return credential;
+
+            return config;
         }
+
         protected dynamic GetPersistedVariableValue(string name, object defaultValue = null)
         {
             return GetPersistedVariableValue<dynamic>(name, o => o, defaultValue);

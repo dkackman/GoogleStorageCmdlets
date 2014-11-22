@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Diagnostics;
 using System.Dynamic;
+using System.Security;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -77,7 +78,8 @@ namespace GoogleStorage
             using (var stream = storage.OpenFile(name, FileMode.Create, FileAccess.Write))
             using (var writer = new StreamWriter(stream))
             {
-                string json = JsonConvert.SerializeObject(value);
+                // ensure we serialize the secure string as encrypted
+                string json = JsonConvert.SerializeObject(value, new SecureStringConverter());
                 writer.Write(json);
             }
         }
@@ -85,6 +87,29 @@ namespace GoogleStorage
         private static IsolatedStorageFile GetStorage()
         {
             return IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
+        }
+
+        /// <summary>
+        /// This guy is user to ensure that secure strings get serilized as encrypted values
+        /// Deserializers, because we are using dynamic objects, will need to know what properties to convert back to secure strings
+        /// </summary>
+        class SecureStringConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(SecureString);
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                SecureString s = value as SecureString;
+                serializer.Serialize(writer, s.ToEncyptedString());
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

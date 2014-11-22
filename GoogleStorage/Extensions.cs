@@ -47,7 +47,7 @@ namespace GoogleStorage
                 using (Pipeline pipeline = runSpace.CreatePipeline())
                 {
                     pipeline.Commands.Add(command);
-                    return pipeline.Invoke().Cast<T>().FirstOrDefault();
+                    return pipeline.Invoke().Select(o => o.BaseObject).Cast<T>().FirstOrDefault();
                 }
             }
         }
