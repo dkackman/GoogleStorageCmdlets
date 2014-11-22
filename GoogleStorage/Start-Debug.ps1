@@ -16,7 +16,7 @@ Write-Host
 #$env:PSModulePath = ".;$env:PSModulePath"
 $env:PSModulePath = (Resolve-Path .).Path + ";" + $env:PSModulePath
 Import-Module GoogleStorage 
-#Set-GoogleStorageConfig 930617506804-n1qur7rdr0o715k7igeivmr779smdn45.apps.googleusercontent.com (convertto-securestring -string uiJO5Zz__vQ0nDVlQCD5jn7B -asplaintext -force) poop
+
 Get-GoogleStorageConfig
 #Get-GoogleStorageBucket -bucket uspto-pair -NoAuth -ListContents
 # Set-GoogleStorageProject poop

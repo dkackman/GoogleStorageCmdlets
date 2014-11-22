@@ -108,6 +108,7 @@ namespace GoogleStorage
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
+                // this will never be called because we are not deserializing to type objects
                 throw new NotImplementedException();
             }
         }
