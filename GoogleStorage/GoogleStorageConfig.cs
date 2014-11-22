@@ -53,8 +53,8 @@ namespace GoogleStorage
         }
     }
 
-    [Cmdlet(VerbsCommon.Show, "GoogleStorageConfig")]
-    public class ShowGoogleStorageConfig : GoogleStorageCmdlet
+    [Cmdlet(VerbsCommon.Get, "GoogleStorageConfig")]
+    public class GetGoogleStorageConfig : GoogleStorageCmdlet
     {
         protected override void ProcessRecord()
         {
@@ -70,7 +70,7 @@ namespace GoogleStorage
                 {
                     WriteError(new ErrorRecord(
                             new InvalidOperationException("Google Storage config not set. Call Set-GoogleStorageConfig first"),
-                            "ShowGoogleStorageConfig",
+                            "GetGoogleStorageConfig",
                             ErrorCategory.ObjectNotFound,
                             "config"));
                 }
@@ -83,7 +83,7 @@ namespace GoogleStorage
             {
                 WriteError(new ErrorRecord(
                         e,
-                        "ShowGoogleStorageConfig",
+                        "GetGoogleStorageConfig",
                         ErrorCategory.NotSpecified,
                         "config"));
             }

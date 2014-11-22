@@ -12,7 +12,7 @@ namespace GoogleStorage
 
         public static T GetPersistedVariableValue<T>(this PSCmdlet cmdlet, string name, Func<dynamic, T> convert, object defaultValue = null)
         {
-            // if the variable isn't in session state - see if it is persted and add it to the session
+            // if the variable isn't in session state - see if it is persisted and add it to the session
             if (cmdlet.GetVariableValue(name, null) == null)
             {
                 var storage = new PersistantStorage();

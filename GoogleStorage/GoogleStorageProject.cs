@@ -31,15 +31,15 @@ namespace GoogleStorage
             {
                 WriteError(new ErrorRecord(
                         e,
-                        "ShowGoogleStorageProject",
+                        "SetGoogleStorageProject",
                         ErrorCategory.NotSpecified,
                         "ProjectName"));
             }
         }
     }
 
-    [Cmdlet(VerbsCommon.Show, "GoogleStorageProject")]
-    public class ShowGoogleStorageProject : PSCmdlet
+    [Cmdlet(VerbsCommon.Get, "GoogleStorageProject")]
+    public class GetGoogleStorageProject : PSCmdlet
     {
         protected override void ProcessRecord()
         {
@@ -51,7 +51,7 @@ namespace GoogleStorage
                 {
                     WriteError(new ErrorRecord(
                             new InvalidOperationException("Google Storage project name not set. Call Set-GoogleStorageProject first"),
-                            "ShowGoogleStorageProject",
+                            "GetGoogleStorageProject",
                             ErrorCategory.ObjectNotFound,
                             "ProjectName"));
                 }
@@ -64,7 +64,7 @@ namespace GoogleStorage
             {
                 WriteError(new ErrorRecord(
                         e,
-                        "ShowGoogleStorageProject",
+                        "GetGoogleStorageProject",
                         ErrorCategory.NotSpecified,
                         "ProjectName"));
             }
