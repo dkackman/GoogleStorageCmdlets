@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{617777
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicRestProxy.PortableHttpClient", "DynamicRestProxy.Portable\DynamicRestProxy.PortableHttpClient.csproj", "{11B51B4D-D60E-42E0-81D8-C9BCC08063AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,10 @@ Global
 		{D0C7BF55-55BA-4D77-92C6-5AC6E9619286}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0C7BF55-55BA-4D77-92C6-5AC6E9619286}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0C7BF55-55BA-4D77-92C6-5AC6E9619286}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11B51B4D-D60E-42E0-81D8-C9BCC08063AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11B51B4D-D60E-42E0-81D8-C9BCC08063AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11B51B4D-D60E-42E0-81D8-C9BCC08063AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11B51B4D-D60E-42E0-81D8-C9BCC08063AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

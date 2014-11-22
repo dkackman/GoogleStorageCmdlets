@@ -54,7 +54,7 @@ namespace GoogleStorage
     }
 
     [Cmdlet(VerbsCommon.Show, "GoogleStorageConfig")]
-    public class ShowGoogleStorageConfig : PSCmdlet
+    public class ShowGoogleStorageConfig : GoogleStorageCmdlet
     {
         protected override void ProcessRecord()
         {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Security;
 using System.Management.Automation;
+using System.Diagnostics;
 
 using Microsoft.CSharp.RuntimeBinder;
 
@@ -25,41 +26,32 @@ namespace GoogleStorage
         public GoogleOAuth2(string scope)
         {
             Debug.Assert(!string.IsNullOrEmpty(scope));
-            
+
             _scope = scope;
         }
 
-        public async Task<string> Authenticate(string token, PSCredential credential)
+        public async Task<string> Authenticate(PSCredential credential)
         {
-            return await Authenticate(token, credential, CancellationToken.None);
+            return await Authenticate(credential, CancellationToken.None);
         }
 
-        public async Task<string> Authenticate(string token, PSCredential credential, CancellationToken cancelToken)
+        public async Task<string> Authenticate(PSCredential credential, CancellationToken cancelToken)
         {
-            // if we have a token already just use it
-            if (!string.IsNullOrEmpty(token))
-                return token;
+            dynamic access = await GetNewAccessToken(credential, cancelToken);
+            StoreAccess(access);
 
-            dynamic access = null;
-            // if we have a stored token use it
-            if (_storage.ObjectExists(_scope.GetHashCode() + ".google.auth.json"))
-            {
-                access = _storage.RetrieveObject(_scope.GetHashCode() + ".google.auth.json");
+            return access.access_token;
+        }
 
-                // if the stored token is expired refresh it
-                if (DateTime.UtcNow >= access.expiry)
-                {
-                    access = await RefreshAccessToken(access, credential, cancelToken);
-                    StoreAccess(access);
-                }
-            }
-            else
+        public async Task<string> GetAccessToken(dynamic access, PSCredential credential, CancellationToken cancelToken)
+        {
+            Debug.Assert(access != null);
+
+            if (DateTime.UtcNow >= access.expiry)
             {
-                // no stored token - go get a new one
-                access = await GetNewAccessToken(credential, cancelToken);
+                access = await RefreshAccessToken(access, credential, cancelToken);
                 StoreAccess(access);
             }
-
             return access.access_token;
         }
 
