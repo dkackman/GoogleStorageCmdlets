@@ -54,7 +54,7 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="GoogleOAuth2.cs" />
-    <Compile Include="GoogleStorageAuth.cs" />
+    <Compile Include="GoogleStorageAccess.cs" />
     <Compile Include="GoogleStorageAuthenticatedCmdlet.cs" />
     <Compile Include="GoogleStorageBucket.cs" />
     <Compile Include="GoogleStorageBuckets.cs" />

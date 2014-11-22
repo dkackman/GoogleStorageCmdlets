@@ -5,15 +5,9 @@ using System.Diagnostics;
 
 namespace GoogleStorage
 {
-    [Cmdlet(VerbsSecurity.Grant, "GoogleStorageAuth")]
-    public class GrantGoogleStorageAuth : GoogleStorageCmdlet
+    [Cmdlet(VerbsSecurity.Grant, "GoogleStorageAccess")]
+    public class GrantGoogleStorageAccess : GoogleStorageCmdlet
     {
-        public GrantGoogleStorageAuth()
-        {
-            Persist = false;
-            ShowBrowser = false;
-        }
-
         [Parameter(Mandatory = false)]
         public SwitchParameter Persist { get; set; }
 
@@ -39,7 +33,7 @@ namespace GoogleStorage
                     Process.Start((string)response.verification_url);
                 }
 
-                WriteObject("Enter this code in order to authorize access to Google Storage");
+                WriteObject("Enter this code in the authorize web page to grant access to Google Storage");
                 WriteObject(response.user_code);
                 WriteObject("");
 
@@ -78,7 +72,7 @@ namespace GoogleStorage
     }
 
     [Cmdlet(VerbsSecurity.Revoke, "GoogleStorageAuth")]
-    public class RevokeGoogleStorageAuth : GoogleStorageCmdlet
+    public class RevokeGoogleStorageAccess : GoogleStorageCmdlet
     {
         protected override void ProcessRecord()
         {
