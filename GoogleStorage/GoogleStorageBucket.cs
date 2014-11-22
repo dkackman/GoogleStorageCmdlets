@@ -18,6 +18,9 @@ namespace GoogleStorage
         [Parameter(Mandatory = false)]
         public SwitchParameter ListContents { get; set; }
 
+        [Parameter(Mandatory = false)]
+        public SwitchParameter ProjectName { get; set; }
+
         protected override void ProcessRecord()
         {
             try
@@ -61,6 +64,11 @@ namespace GoogleStorage
         private dynamic GetBucketEndPoint()
         {
             dynamic google = CreateClient();
+            var project = ProjectName;
+          //  if (string.IsNullOrEmpty(project))
+            {
+          //      project = this.GetPersistedVariableValue();
+            }
             return google.storage.v1.b(Bucket);
         }
 

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Security;
 using System.Management.Automation;
-using System.Diagnostics;
 
 using Microsoft.CSharp.RuntimeBinder;
 
@@ -45,7 +44,7 @@ namespace GoogleStorage
 
         public async Task<string> GetAccessToken(dynamic access, PSCredential credential, CancellationToken cancelToken)
         {
-            Debug.Assert(access != null);
+            Debug.Assert((object)access != null);
 
             if (DateTime.UtcNow >= access.expiry)
             {

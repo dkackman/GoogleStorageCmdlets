@@ -58,7 +58,6 @@
     <Compile Include="GoogleStorageAuthenticatedCmdlet.cs" />
     <Compile Include="GoogleStorageBucket.cs" />
     <Compile Include="GoogleStorageCmdlet.cs" />
-    <Compile Include="PersistableState.cs" />
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="GoogleStorageProject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

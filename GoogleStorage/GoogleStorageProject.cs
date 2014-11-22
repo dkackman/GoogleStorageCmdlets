@@ -5,7 +5,7 @@ using System.Management.Automation;
 namespace GoogleStorage
 {
     [Cmdlet(VerbsCommon.Set, "GoogleStorageProject")]
-    public class SetGoogleStorageProject : PSCmdlet
+    public class SetGoogleStorageProject : GoogleStorageCmdlet
     {
         public SetGoogleStorageProject()
         {
@@ -39,7 +39,7 @@ namespace GoogleStorage
     }
 
     [Cmdlet(VerbsCommon.Get, "GoogleStorageProject")]
-    public class GetGoogleStorageProject : PSCmdlet
+    public class GetGoogleStorageProject : GoogleStorageCmdlet
     {
         protected override void ProcessRecord()
         {
@@ -72,7 +72,7 @@ namespace GoogleStorage
     }
 
     [Cmdlet(VerbsCommon.Clear, "GoogleStorageProject")]
-    public class ClearGoogleStorageProject : PSCmdlet
+    public class ClearGoogleStorageProject : GoogleStorageCmdlet
     {
         protected override void ProcessRecord()
         {

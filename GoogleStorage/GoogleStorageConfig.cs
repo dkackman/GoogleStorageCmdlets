@@ -5,7 +5,7 @@ using System.Security;
 namespace GoogleStorage
 {
     [Cmdlet(VerbsCommon.Set, "GoogleStorageConfig")]
-    public class SetGoogleStorageConfig : PSCmdlet
+    public class SetGoogleStorageConfig : GoogleStorageCmdlet
     {
         public SetGoogleStorageConfig()
         {
@@ -91,7 +91,7 @@ namespace GoogleStorage
     }
 
     [Cmdlet(VerbsCommon.Clear, "GoogleStorageConfig")]
-    public class ClearGoogleStorageConfig : PSCmdlet
+    public class ClearGoogleStorageConfig : GoogleStorageCmdlet
     {
         protected override void ProcessRecord()
         {
