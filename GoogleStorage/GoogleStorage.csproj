@@ -86,6 +86,9 @@
       <Name>DynamicRestProxy.PortableHttpClient</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Objects\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy RemoteSigned -command "&amp; '$(ProjectDir)Post-Build.ps1' -ProjectName '$(ProjectName)' -ConfigurationName '$(ConfigurationName)' -TargetDir '$(TargetDir)'"</PostBuildEvent>

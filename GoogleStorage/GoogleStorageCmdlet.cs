@@ -3,12 +3,35 @@ using System.Dynamic;
 using System.Diagnostics;
 using System.Threading;
 using System.Management.Automation;
+using System.Collections.Generic;
 
 namespace GoogleStorage
 {
     public abstract class GoogleStorageCmdlet : PSCmdlet
     {
         private CancellationTokenSource _cancelTokenSource;
+
+        protected void WriteDynamicObject(dynamic o, string propertyName = null)
+        {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                WriteObject(o);
+            }
+            else
+            {                
+                IDictionary<string, object> d = o as IDictionary<string, object>;
+                Debug.Assert(d != null); 
+                
+                if (!d.ContainsKey(propertyName))
+                {
+                    throw new InvalidOperationException(string.Format("Property {0} does not exist on result object", propertyName));
+                }
+                else
+                {
+                    WriteObject(d[propertyName]);
+                }
+            }
+        }
 
         protected string GetProjectName(string propertyValue)
         {

@@ -13,6 +13,9 @@ namespace GoogleStorage.Buckets
         [Parameter(Mandatory = false)]
         public SwitchParameter ListContents { get; set; }
 
+        [Parameter(Mandatory = false)]
+        public string DisplayProperty { get; set; }
+
         protected override void ProcessRecord()
         {
             try
@@ -27,7 +30,7 @@ namespace GoogleStorage.Buckets
                     {
                         if (verbose)
                         {
-                            WriteObject(item, true);
+                            WriteDynamicObject(item, DisplayProperty);
                         }
                         else
                         {
@@ -39,7 +42,7 @@ namespace GoogleStorage.Buckets
                 {
                     var t = GetBucketMetaData(endpoint);
                     dynamic result = t.Result;
-                    WriteObject(result);
+                    WriteDynamicObject(result, DisplayProperty);
                 }
             }
             catch (HaltCommandException)

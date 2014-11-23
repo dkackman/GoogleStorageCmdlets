@@ -11,6 +11,9 @@ namespace GoogleStorage.Buckets
         [Parameter(Mandatory = false)]
         public string Project { get; set; }
 
+        [Parameter(Mandatory = false)]
+        public string DisplayProperty { get; set; }
+
         protected override void ProcessRecord()
         {
             try
@@ -25,11 +28,14 @@ namespace GoogleStorage.Buckets
                     {
                         WriteObject(item, true);
                     }
+                    else if (!string.IsNullOrEmpty(DisplayProperty))
+                    {
+                        WriteDynamicObject(item, DisplayProperty);
+                    }
                     else
                     {
                         WriteObject(item.id);
                     }
-                    Host.UI.WriteLine("");
                 }
             }
             catch (HaltCommandException)
@@ -50,7 +56,6 @@ namespace GoogleStorage.Buckets
 
         private async Task<dynamic> GetBuckets()
         {
-            
             var project = GetProjectName(Project);
             Debug.Assert(!string.IsNullOrEmpty(project));
 

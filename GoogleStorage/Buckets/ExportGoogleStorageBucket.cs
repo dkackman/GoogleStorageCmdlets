@@ -21,12 +21,6 @@ namespace GoogleStorage.Buckets
         public string Destination { get; set; }
 
         [Parameter(Mandatory = false)]
-        public string[] Include { get; set; }
-
-        [Parameter(Mandatory = false)]
-        public string[] Exclude { get; set; }
-
-        [Parameter(Mandatory = false)]
         public SwitchParameter IncludeMetaData { get; set; }
 
         [Parameter(Mandatory = false)]
@@ -65,13 +59,24 @@ namespace GoogleStorage.Buckets
 
         private void SaveMetaData(dynamic item)
         {
-            WriteVerbose(string.Format("Saving {0} metadata", item.name));
+            // build out the folder strucutre that might be embedded in the item name
+            Directory.CreateDirectory(Path.Combine(Destination, Path.GetDirectoryName(item.name)));
 
             string path = Path.Combine(Destination, item.name + ".json");
-            using (var writer = new StreamWriter(path))
+
+            if (!Force && File.Exists(path))
             {
-                string json = JsonConvert.SerializeObject(item);
-                writer.Write(json);
+                WriteVerbose(string.Format("{0} exists. Skipping", path));
+            }
+            else
+            {
+                WriteVerbose(string.Format("Saving {0} metadata", item.name));
+
+                using (var writer = new StreamWriter(path))
+                {
+                    string json = JsonConvert.SerializeObject(item);
+                    writer.Write(json);
+                }
             }
         }
 
