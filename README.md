@@ -9,8 +9,6 @@ Working:
 - Client configuration (ClientId, ClientSecret, Project set up and persistence)
 - Unauthenticated access to public buckets
 - OAuth2 workflow
-
-Not Working:
 - Authenticated access to buckets
 
 TODO
