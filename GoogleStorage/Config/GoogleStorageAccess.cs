@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Diagnostics;
 
-namespace GoogleStorage
+namespace GoogleStorage.Config
 {
     [Cmdlet(VerbsSecurity.Grant, "GoogleStorageAccess")]
     public class GrantGoogleStorageAccess : GoogleStorageCmdlet

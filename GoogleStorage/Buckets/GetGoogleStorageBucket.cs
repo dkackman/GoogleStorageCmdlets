@@ -7,12 +7,12 @@ using System.Management.Automation;
 
 using DynamicRestProxy.PortableHttpClient;
 
-namespace GoogleStorage
+namespace GoogleStorage.Buckets
 {
     [Cmdlet(VerbsCommon.Get, "GoogleStorageBucket")]
     public class GetGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
-        [Parameter(Mandatory = true, ValueFromPipelineByPropertyName = true)]
+        [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
         [Parameter(Mandatory = false)]

@@ -27,11 +27,10 @@ namespace GoogleStorage
 
             return new DynamicRestClient("https://www.googleapis.com/", null, async (request, cancelToken) =>
             {
-                var authToken = await GetAccessToken(cancelToken);
-                request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", authToken);
+                var accessToken = await GetAccessToken(cancelToken);
+                request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", accessToken);
             });
         }
-
 
         protected async Task<string> GetAccessToken(CancellationToken cancelToken)
         {

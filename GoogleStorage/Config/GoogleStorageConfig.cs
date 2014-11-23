@@ -3,7 +3,7 @@ using System.Management.Automation;
 using System.Dynamic;
 using System.Security;
 
-namespace GoogleStorage
+namespace GoogleStorage.Config
 {
     [Cmdlet(VerbsCommon.Set, "GoogleStorageConfig")]
     public class SetGoogleStorageConfig : GoogleStorageCmdlet

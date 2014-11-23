@@ -52,16 +52,17 @@
     <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Buckets\ExportGoogleStorageBucket.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GoogleOAuth2.cs" />
-    <Compile Include="GoogleStorageAccess.cs" />
+    <Compile Include="Config\GoogleStorageAccess.cs" />
     <Compile Include="GoogleStorageAuthenticatedCmdlet.cs" />
-    <Compile Include="GoogleStorageBucket.cs" />
-    <Compile Include="GoogleStorageBuckets.cs" />
+    <Compile Include="Buckets\GetGoogleStorageBucket.cs" />
+    <Compile Include="Buckets\GetGoogleStorageBuckets.cs" />
     <Compile Include="GoogleStorageCmdlet.cs" />
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="GoogleStorageConfig.cs" />
+    <Compile Include="Config\GoogleStorageConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Start-Debug.ps1">

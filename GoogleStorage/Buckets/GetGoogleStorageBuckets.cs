@@ -8,7 +8,7 @@ using System.Management.Automation;
 
 using DynamicRestProxy.PortableHttpClient;
 
-namespace GoogleStorage
+namespace GoogleStorage.Buckets
 {
     [Cmdlet(VerbsCommon.Get, "GoogleStorageBuckets")]
     public class GetGoogleStorageBuckets : GoogleStorageAuthenticatedCmdlet
