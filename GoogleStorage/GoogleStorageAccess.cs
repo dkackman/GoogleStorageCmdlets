@@ -19,32 +19,37 @@ namespace GoogleStorage
             try
             {
                 var startTask = StartAuth();
-                var response = startTask.Result;
+                var confirmToken = startTask.Result;
 
                 WriteWarning("This action requires authorization with Google Storage");
                 if (!ShowBrowser)
                 {
                     WriteObject("Navigate to this Url in a web browser:");
-                    WriteObject(response.verification_url);
+                    WriteObject(confirmToken.verification_url);
                     WriteObject("");
                 }
                 else
                 {
-                    Process.Start((string)response.verification_url);
+                    Process.Start((string)confirmToken.verification_url);
                 }
 
                 WriteObject("Enter this code in the authorize web page to grant access to Google Storage");
-                WriteObject(response.user_code);
+                WriteObject(confirmToken.user_code);
                 WriteObject("");
 
                 WriteVerbose("Waiting for authorization...");
 
-                var confirmTask = ConfirmAuth(response);
+                var confirmTask = ConfirmAuth(confirmToken);
                 var access = confirmTask.Result;
 
-                access.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(response.expires_in);
                 SetPersistedVariableValue("access", access, Persist);
                 WriteVerbose("Authorized");
+            }
+            catch (HaltCommandException)
+            {
+            }
+            catch (PipelineStoppedException)
+            {
             }
             catch (AggregateException e)
             {

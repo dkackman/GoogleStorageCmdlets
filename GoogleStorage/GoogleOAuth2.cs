@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Security;
-using System.Management.Automation;
 
 using Microsoft.CSharp.RuntimeBinder;
 
@@ -20,7 +20,6 @@ namespace GoogleStorage
     {
         // the set of scopes to authorize
         private string _scope;
-        private PersistantStorage _storage = new PersistantStorage();
 
         public GoogleOAuth2(string scope)
         {
@@ -50,7 +49,21 @@ namespace GoogleStorage
             var response = await google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), refresh_token: access.refresh_token, grant_type: "refresh_token");
 
             response.refresh_token = access.refresh_token; // the new access token doesn't have a new refresh token so move our current one here for long term storage
+            response.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(response.expires_in);
+            SecureAccessToken(response);
+
             return response;
+        }
+
+        private static void SecureAccessToken(dynamic access)
+        {
+            string token = access.access_token;
+
+            SecureString secure = new SecureString();
+            Array.ForEach(token.ToArray(), secure.AppendChar);
+            secure.MakeReadOnly();
+
+            access.access_token = secure;
         }
 
         /// <summary>
@@ -61,12 +74,12 @@ namespace GoogleStorage
         /// This should only need to be done once because the access token will be stored and refreshed for future test runs
         /// </summary>
         /// <returns></returns>
-        public async Task<dynamic> WaitForConfirmation(dynamic response, dynamic config, CancellationToken cancelToken)
+        public async Task<dynamic> WaitForConfirmation(dynamic confirmToken, dynamic config, CancellationToken cancelToken)
         {
             SecureString clientSecret = config.ClientSecret;
 
-            long expiration = response.expires_in;
-            long interval = response.interval;
+            long expiration = confirmToken.expires_in;
+            long interval = confirmToken.interval;
             long time = interval;
 
             dynamic google = new DynamicRestClient("https://accounts.google.com/o/oauth2/");
@@ -75,11 +88,16 @@ namespace GoogleStorage
             while (time < expiration)
             {
                 Thread.Sleep((int)interval * 1000);
-                dynamic tokenResonse = await google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), code: response.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
+
+                dynamic tokenResponse = await google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), code: confirmToken.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
                 try
                 {
-                    if (tokenResonse.access_token != null)
-                        return tokenResonse;
+                    if (tokenResponse.access_token != null)
+                    {
+                        tokenResponse.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(tokenResponse.expires_in);
+                        SecureAccessToken(tokenResponse);
+                        return tokenResponse;
+                    }
                 }
                 catch (RuntimeBinderException)
                 {

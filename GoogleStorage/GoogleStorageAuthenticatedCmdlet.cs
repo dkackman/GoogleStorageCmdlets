@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Diagnostics;
 using System.Net.Http.Headers;
+using System.Security;
 
 using DynamicRestProxy.PortableHttpClient;
 
@@ -41,7 +42,12 @@ namespace GoogleStorage
                 return "";
             }
 
-            var access = this.GetPersistedVariableValue<dynamic>("access", o => o);
+            var access = this.GetPersistedVariableValue<dynamic>("access", d =>
+                {
+                    d.access_token = ((string)d.access_token).FromEncyptedString();
+                    return d;
+                });
+
             if (access == null)
             {
                 throw new AccessViolationException("Access token not set. Call Grant-GoogleStorageAuth first");
@@ -54,7 +60,8 @@ namespace GoogleStorage
                 SetPersistedVariableValue("access", access, Persist);
             }
 
-            return access.access_token;
+            SecureString token = access.access_token;
+            return token.ToUnsecureString();
         }
     }
 }
