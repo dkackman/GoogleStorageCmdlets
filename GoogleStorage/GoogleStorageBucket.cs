@@ -27,10 +27,17 @@ namespace GoogleStorage
                 {
                     var t = GetBucketContents(endpoint);
                     var contents = t.Result;
+                    bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
                     foreach (var item in contents.items)
                     {
-                        WriteObject(item);
-                        Host.UI.WriteLine("");
+                        if (verbose)
+                        {
+                            WriteObject(item, true);
+                        }
+                        else
+                        {
+                            WriteObject(item.id);
+                        }
                     }
                 }
                 else

@@ -23,9 +23,17 @@ namespace GoogleStorage
                 var t = GetBuckets();
                 dynamic result = t.Result;
 
+                bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
                 foreach (var item in result.items)
                 {
-                    WriteObject(item);
+                    if (verbose)
+                    {
+                        WriteObject(item, true);
+                    }
+                    else
+                    {
+                        WriteObject(item.id);
+                    }
                     Host.UI.WriteLine("");
                 }
             }
@@ -47,6 +55,7 @@ namespace GoogleStorage
 
         private async Task<dynamic> GetBuckets()
         {
+            
             var project = GetProjectName(Project);
             Debug.Assert(!string.IsNullOrEmpty(project));
 
