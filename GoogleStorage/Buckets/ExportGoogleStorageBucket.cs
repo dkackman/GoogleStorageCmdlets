@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Management.Automation;
+
+using Newtonsoft.Json;
 
 using DynamicRestProxy.PortableHttpClient;
 
@@ -34,13 +36,15 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var endpoint = GetBucketEndPoint();
-
-                var t = GetBucketContents(endpoint);
+                var t = GetBucketContents();
                 var contents = t.Result;
+
                 foreach (var item in contents.items)
                 {
-
+                    if (IncludeMetaData)
+                    {
+                        SaveMetaData(item);
+                    }
                 }
             }
             catch (HaltCommandException)
@@ -59,16 +63,23 @@ namespace GoogleStorage.Buckets
             }
         }
 
-        private async Task<dynamic> GetBucketContents(dynamic endpoint)
+        private void SaveMetaData(dynamic item)
         {
-            return await endpoint.o.get(GetCancellationToken());
+            WriteVerbose(string.Format("Saving {0} metadata", item.name));
+
+            string path = Path.Combine(Destination, item.name + ".json");
+            using (var writer = new StreamWriter(path))
+            {
+                string json = JsonConvert.SerializeObject(item);
+                writer.Write(json);
+            }
         }
 
-        private dynamic GetBucketEndPoint()
+        private async Task<dynamic> GetBucketContents()
         {
             dynamic google = CreateClient();
 
-            return google.storage.v1.b(Bucket);
+            return await google.storage.v1.b(Bucket).o.get(GetCancellationToken());
         }
     }
 }
