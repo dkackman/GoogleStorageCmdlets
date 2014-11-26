@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using System.Management.Automation;
 
 using Newtonsoft.Json;
-
-using DynamicRestProxy.PortableHttpClient;
 
 namespace GoogleStorage.Buckets
 {
@@ -39,6 +35,9 @@ namespace GoogleStorage.Buckets
                     {
                         SaveMetaData(item);
                     }
+
+                    Task t1 = DownloadItem(item);
+                    t1.Wait();
                 }
             }
             catch (HaltCommandException)
@@ -55,6 +54,14 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
+        }
+
+        private async Task DownloadItem(dynamic item)
+        {
+            var downloader = new FileDownloader(item.mediaLink, Path.Combine(Destination, item.name), item.contentType);
+            var cancelToken = GetCancellationToken();
+            var access_token = await GetAccessToken(cancelToken);
+            downloader.Download(cancelToken, access_token);
         }
 
         private void SaveMetaData(dynamic item)

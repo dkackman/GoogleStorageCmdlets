@@ -34,8 +34,6 @@ namespace GoogleStorage
 
         protected async Task<string> GetAccessToken(CancellationToken cancelToken)
         {
-            Debug.Assert(!NoAuth, "You should really check NoAuth prior to calling this method");
-
             if (NoAuth)
             {
                 return "";
