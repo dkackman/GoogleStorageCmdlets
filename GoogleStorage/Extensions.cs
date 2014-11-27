@@ -3,11 +3,21 @@ using System.Security;
 using System.Runtime.InteropServices;
 using System.Management.Automation.Runspaces;
 using System.Linq;
+using System.Reflection;
 
 namespace GoogleStorage
 {
     static class Extensions
     {
+        public static void ForceCanonicalPathAndQuery(this Uri uri)
+        {
+            string paq = uri.PathAndQuery; // need to access PathAndQuery
+            FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
+            ulong flags = (ulong)flagsFieldInfo.GetValue(uri);
+            flags &= ~((ulong)0x30); // Flags.PathNotCanonical|Flags.QueryNotCanonical
+            flagsFieldInfo.SetValue(uri, flags);
+        }
+
         public static string ToUnsecureString(this SecureString securePassword)
         {
             if (securePassword == null)

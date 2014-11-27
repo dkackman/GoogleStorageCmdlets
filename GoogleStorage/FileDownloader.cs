@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace GoogleStorage
 {
@@ -24,18 +26,37 @@ namespace GoogleStorage
             MimeType = mimeType;
         }
 
-        public void Download(CancellationToken cancelToken, string access_token)
+        public async Task Download(CancellationToken cancelToken, string access_token)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Destination));
-            var uri = "https://www.googleapis.com/download/storage/v1/b/uspto-pair/o/applications%2F05900002.zip?generation=1370956749027000&alt=media";
 
-            WebClient c = new WebClient();
-            var b = c.DownloadData(uri);
+            var uri = new Uri(Source);
+            uri.ForceCanonicalPathAndQuery();
 
-            //using(var client = new WebClient())
-            //{
-            //    client.DownloadFile(Source, Destination);
-            //}
+            var handler = new HttpClientHandler();
+            if (handler.SupportsAutomaticDecompression)
+            {
+                handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            }
+
+            using (var client = new HttpClient(handler, true))
+            {
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MimeType));
+
+                if (!string.IsNullOrEmpty(access_token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", access_token);
+                }
+
+                var response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
+
+                using (var stream = new FileStream(Destination, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    await response.Content.CopyToAsync(stream);
+                }
+            }
         }
     }
 }
