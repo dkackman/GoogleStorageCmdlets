@@ -64,6 +64,7 @@
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Config\GoogleStorageConfig.cs" />
+    <Compile Include="UriBug.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Start-Debug.ps1">

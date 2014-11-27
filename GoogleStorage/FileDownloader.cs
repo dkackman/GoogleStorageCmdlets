@@ -27,9 +27,8 @@ namespace GoogleStorage
         public void Download(CancellationToken cancelToken, string access_token)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Destination));
-            var s = "https://www.googleapis.com/download/storage/v1/b/uspto-pair/o/applications%2F05900002.zip?generation=1370956749027000&alt=media";
+            var uri = "https://www.googleapis.com/download/storage/v1/b/uspto-pair/o/applications%2F05900002.zip?generation=1370956749027000&alt=media";
 
-            var uri = new Uri(s);
             WebClient c = new WebClient();
             var b = c.DownloadData(uri);
 
