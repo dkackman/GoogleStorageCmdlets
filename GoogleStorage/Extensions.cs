@@ -9,6 +9,11 @@ namespace GoogleStorage
 {
     static class Extensions
     {
+        /// <summary>
+        /// http://stackoverflow.com/questions/781205/getting-a-url-with-an-url-encoded-slash
+        /// object media links may have eced path tokens
+        /// </summary>
+        /// <param name="uri"></param>
         public static void ForceCanonicalPathAndQuery(this Uri uri)
         {
             string paq = uri.PathAndQuery; // need to access PathAndQuery
