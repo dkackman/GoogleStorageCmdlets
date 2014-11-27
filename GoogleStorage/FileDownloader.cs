@@ -31,8 +31,7 @@ namespace GoogleStorage
 
             var uri = new Uri(s);
             WebClient c = new WebClient();
-            //c.Headers.Add("Authorization", "token " + "dddd");
-            c.DownloadFile(s, Destination);
+            var b = c.DownloadData(uri);
 
             //using(var client = new WebClient())
             //{
