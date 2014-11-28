@@ -49,7 +49,7 @@ namespace GoogleStorage
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", access_token);
                 }
 
-                var response = await client.GetAsync(uri);
+                var response = await client.GetAsync(uri, cancelToken);
                 response.EnsureSuccessStatusCode();
 
                 using (var stream = new FileStream(Destination, FileMode.Create, FileAccess.Write, FileShare.None))

@@ -22,6 +22,9 @@ namespace GoogleStorage.Buckets
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
 
+        [Parameter(Mandatory = false)]
+        public SwitchParameter BreakOnError { get; set; }
+
         protected override void ProcessRecord()
         {
             try
@@ -58,10 +61,36 @@ namespace GoogleStorage.Buckets
 
         private async Task DownloadItem(dynamic item)
         {
-            var downloader = new FileDownloader(item.mediaLink, Path.Combine(Destination, item.name), item.contentType);
-            var cancelToken = GetCancellationToken();
-            var access_token = await GetAccessToken(cancelToken);
-            downloader.Download(cancelToken, access_token);
+            try
+            {
+                var path = Path.Combine(Destination, item.name);
+                if (!Force && File.Exists(path))
+                {
+                    throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
+                }
+
+                var downloader = new FileDownloader(item.mediaLink, path, item.contentType);
+                var cancelToken = GetCancellationToken();
+                var access_token = await GetAccessToken(cancelToken);
+                await downloader.Download(cancelToken, access_token);
+            }
+            catch (HaltCommandException)
+            {
+                throw;
+            }
+            catch (PipelineStoppedException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                if (BreakOnError)
+                {
+                    throw;
+                }
+
+                WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
+            }
         }
 
         private void SaveMetaData(dynamic item)

@@ -17,7 +17,6 @@ Write-Host
 $env:PSModulePath = (Resolve-Path .).Path + ";" + $env:PSModulePath
 Import-Module GoogleStorage 
 
-#debug-uriformatting
 
 #Grant-GoogleStorageAuth -ShowBrowser -Persist
 
