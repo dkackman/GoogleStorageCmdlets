@@ -32,16 +32,7 @@ namespace GoogleStorage.Buckets
                 var t = GetBucketContents();
                 var contents = t.Result;
 
-                foreach (var item in contents.items)
-                {
-                    if (IncludeMetaData)
-                    {
-                        SaveMetaData(item);
-                    }
-
-                    Task t1 = DownloadItem(item);
-                    t1.Wait();
-                }
+                ExportObjects(contents.items);
             }
             catch (HaltCommandException)
             {
@@ -59,38 +50,57 @@ namespace GoogleStorage.Buckets
             }
         }
 
-        private async Task DownloadItem(dynamic item)
+        private void ExportObjects(dynamic items)
         {
-            try
+            int count = items.Count;
+            int i = 0;
+            foreach (var item in items)
             {
-                var path = Path.Combine(Destination, item.name);
-                if (!Force && File.Exists(path))
+                try
                 {
-                    throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
-                }
+                    if (IncludeMetaData)
+                    {
+                        SaveMetaData(item);
+                    }
 
-                var downloader = new FileDownloader(item.mediaLink, path, item.contentType);
-                var cancelToken = GetCancellationToken();
-                var access_token = await GetAccessToken(cancelToken);
-                await downloader.Download(cancelToken, access_token);
-            }
-            catch (HaltCommandException)
-            {
-                throw;
-            }
-            catch (PipelineStoppedException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                if (BreakOnError)
+                    var path = Path.Combine(Destination, item.name);
+
+                    Task t1 = ExportObject(item, path);
+                    t1.Wait();
+
+                    WriteVerbose(string.Format("({2} of {3}) Exported {0} to {1}", item.name, path, ++i, count));
+                }
+                catch (HaltCommandException)
                 {
                     throw;
                 }
+                catch (PipelineStoppedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    if (BreakOnError)
+                    {
+                        throw;
+                    }
 
-                WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
+                    WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
+                }
             }
+        }
+
+        private async Task ExportObject(dynamic item, string path)
+        {
+            if (!Force && File.Exists(path))
+            {
+                throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
+            }
+
+            var downloader = new FileDownloader(item.mediaLink, path, item.contentType);
+            var cancelToken = GetCancellationToken();
+            var access_token = await GetAccessToken(cancelToken);
+            await downloader.Download(cancelToken, access_token);
         }
 
         private void SaveMetaData(dynamic item)

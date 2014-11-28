@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
@@ -43,6 +40,11 @@ namespace GoogleStorage
             {
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MimeType));
+
+                if (handler.SupportsTransferEncodingChunked())
+                {
+                    client.DefaultRequestHeaders.TransferEncodingChunked = true;
+                }
 
                 if (!string.IsNullOrEmpty(access_token))
                 {
