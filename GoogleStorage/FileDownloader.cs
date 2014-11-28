@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
@@ -17,13 +14,13 @@ namespace GoogleStorage
 
         public string Destination { get; private set; }
 
-        public string MimeType { get; private set; }
+        public string ContentType { get; private set; }
 
-        public FileDownloader(string source, string destination, string mimeType)
+        public FileDownloader(string source, string destination, string contentType)
         {
             Source = source;
             Destination = destination;
-            MimeType = mimeType;
+            ContentType = contentType;
         }
 
         public async Task Download(CancellationToken cancelToken, string access_token)
@@ -42,7 +39,7 @@ namespace GoogleStorage
             using (var client = new HttpClient(handler, true))
             {
                 client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MimeType));
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
 
                 if (!string.IsNullOrEmpty(access_token))
                 {

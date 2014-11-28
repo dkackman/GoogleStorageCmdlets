@@ -39,8 +39,10 @@ namespace GoogleStorage.Buckets
                         SaveMetaData(item);
                     }
 
-                    Task t1 = DownloadItem(item);
+                    var path = Path.Combine(Destination, item.name);
+                    Task t1 = DownloadItem(item, path);
                     t1.Wait();
+                    WriteVerbose(string.Format("Object {0} saved to {1}", item.name, path));
                 }
             }
             catch (HaltCommandException)
@@ -59,17 +61,16 @@ namespace GoogleStorage.Buckets
             }
         }
 
-        private async Task DownloadItem(dynamic item)
+        private async Task DownloadItem(dynamic item, string path)
         {
             try
             {
-                var path = Path.Combine(Destination, item.name);
                 if (!Force && File.Exists(path))
                 {
                     throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
                 }
 
-                var downloader = new FileDownloader(item.mediaLink, path, item.contentType);
+                var downloader = new FileDownloader(item.mediaLink, path, GetContentType(item.contentType));
                 var cancelToken = GetCancellationToken();
                 var access_token = await GetAccessToken(cancelToken);
                 await downloader.Download(cancelToken, access_token);
@@ -89,8 +90,19 @@ namespace GoogleStorage.Buckets
                     throw;
                 }
 
-                WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
+                //WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
+        }
+
+        private static string GetContentType(string contentType)
+        {
+            int semicolon = contentType.IndexOf(';');
+            if (semicolon != -1)
+            {
+                return contentType.Substring(0, semicolon);
+            }
+
+            return contentType;
         }
 
         private void SaveMetaData(dynamic item)
