@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace GoogleStorage.Pipeline
+namespace GoogleStorage.ProducerConsumer
 {
     class Stage<TInput, TOutput> : IDisposable
         where TInput : class
@@ -42,7 +42,8 @@ namespace GoogleStorage.Pipeline
         {
             foreach (var input in _producer())
             {
-                Output.Add(_transform(input));
+                var o = _transform(input);
+                Output.Add(o);
             }
 
             Output.CompleteAdding();

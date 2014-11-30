@@ -1,9 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 using Newtonsoft.Json;
+
+using GoogleStorage.ProducerConsumer;
 
 namespace GoogleStorage.Buckets
 {
@@ -31,8 +37,29 @@ namespace GoogleStorage.Buckets
             {
                 var t = GetBucketContents();
                 var contents = t.Result;
+                IEnumerable<dynamic> items = contents.items;
+                using (var objects = new Stage<dynamic, dynamic>(() => contents.items))
+                using (var downloads = new Stage<dynamic, Tuple<dynamic, string>>(() => objects.Output.GetConsumingEnumerable(), d =>
+                    {
+                        Task<Tuple<dynamic, string>> task = ExportObject(d);
+                        task.Wait();
+                        return task.Result;
+                    }))
+                {
+                    var tasks = new Task[] 
+                    {
+                        Task.Run(() => objects.Start()),
+                        Task.Run(() => downloads.Start()),
+                    };
 
-                ExportObjects(contents.items);
+                    int count = items.Count();
+                    int i = 0;
+                    foreach (var item in downloads.Output.GetConsumingEnumerable())
+                    {
+                        WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
+                    }
+                }
+                // ExportObjects(contents.items);
             }
             catch (HaltCommandException)
             {
@@ -50,48 +77,10 @@ namespace GoogleStorage.Buckets
             }
         }
 
-        private void ExportObjects(dynamic items)
+
+        private async Task<Tuple<dynamic, string>> ExportObject(dynamic item)
         {
-            int count = items.Count;
-            int i = 0;
-            foreach (var item in items)
-            {
-                try
-                {
-                    if (IncludeMetaData)
-                    {
-                        SaveMetaData(item);
-                    }
-
-                    var path = Path.Combine(Destination, item.name);
-
-                    Task t1 = ExportObject(item, path);
-                    t1.Wait();
-
-                    WriteVerbose(string.Format("({2} of {3}) Exported {0} to {1}", item.name, path, ++i, count));
-                }
-                catch (HaltCommandException)
-                {
-                    throw;
-                }
-                catch (PipelineStoppedException)
-                {
-                    throw;
-                }
-                catch (Exception e)
-                {
-                    if (BreakOnError)
-                    {
-                        throw;
-                    }
-
-                    WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
-                }
-            }
-        }
-
-        private async Task ExportObject(dynamic item, string path)
-        {
+            var path = Path.Combine(Destination, item.name);
             if (!Force && File.Exists(path))
             {
                 throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
@@ -101,6 +90,8 @@ namespace GoogleStorage.Buckets
             var cancelToken = GetCancellationToken();
             var access_token = await GetAccessToken(cancelToken);
             await downloader.Download(cancelToken, access_token);
+
+            return new Tuple<dynamic, string>(item, path);
         }
 
         private void SaveMetaData(dynamic item)
