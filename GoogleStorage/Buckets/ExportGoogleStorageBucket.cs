@@ -37,28 +37,48 @@ namespace GoogleStorage.Buckets
             {
                 var t = GetBucketContents();
                 var contents = t.Result;
-                IEnumerable<dynamic> items = contents.items;
-                using (var objects = new Stage<dynamic, dynamic>(() => contents.items))
-                using (var downloads = new Stage<dynamic, Tuple<dynamic, string>>(() => objects.Output.GetConsumingEnumerable(), d =>
-                    {
-                        Task<Tuple<dynamic, string>> task = ExportObject(d);
-                        task.Wait();
-                        return task.Result;
-                    }))
-                {
-                    var tasks = new Task[] 
-                    {
-                        Task.Run(() => objects.Start()),
-                        Task.Run(() => downloads.Start()),
-                    };
 
-                    int count = items.Count();
-                    int i = 0;
-                    foreach (var item in downloads.Output.GetConsumingEnumerable())
-                    {
-                        WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
-                    }
+                IEnumerable<dynamic> items = contents.items;
+                var pipeline = new DownloadPipline()
+                {
+                    Destination = Destination,
+                    Force = Force
+                };
+
+                var cancelToken = GetCancellationToken();
+                var accessTask = GetAccessToken(cancelToken);
+                var access_token = accessTask.Result;
+
+                pipeline.Start(items, cancelToken, access_token);
+
+                int count = items.Count();
+                int i = 0;
+                foreach (var item in pipeline.Output.GetConsumingEnumerable())
+                {
+                    WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
                 }
+
+                //using (var objects = new Stage<dynamic, dynamic>(() => contents.items))
+                //using (var downloads = new Stage<dynamic, Tuple<dynamic, string>>(() => objects.Output.GetConsumingEnumerable(), d =>
+                //    {
+                //        Task<Tuple<dynamic, string>> task = ExportObject(d);
+                //        task.Wait();
+                //        return task.Result;
+                //    }))
+                //{
+                //    var tasks = new Task[] 
+                //    {
+                //        Task.Run(() => objects.Start()),
+                //        Task.Run(() => downloads.Start()),
+                //    };
+
+                //    int count = items.Count();
+                //    int i = 0;
+                //    foreach (var item in downloads.Output.GetConsumingEnumerable())
+                //    {
+                //        WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
+                //    }
+                //}
                 // ExportObjects(contents.items);
             }
             catch (HaltCommandException)
