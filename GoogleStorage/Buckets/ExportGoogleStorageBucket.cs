@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Newtonsoft.Json;
 
@@ -38,48 +36,31 @@ namespace GoogleStorage.Buckets
                 var t = GetBucketContents();
                 var contents = t.Result;
 
-                IEnumerable<dynamic> items = contents.items;
-                var pipeline = new DownloadPipline()
-                {
-                    Destination = Destination,
-                    Force = Force
-                };
-
                 var cancelToken = GetCancellationToken();
                 var accessTask = GetAccessToken(cancelToken);
                 var access_token = accessTask.Result;
 
-                pipeline.Start(items, cancelToken, access_token);
-
-                int count = items.Count();
-                int i = 0;
-                foreach (var item in pipeline.Output.GetConsumingEnumerable())
+                IEnumerable<dynamic> items = contents.items;
+                using (var pipeline = new DownloadPipline()
                 {
-                    WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
+                    Destination = Destination,
+                    Force = Force
+                })
+                {
+                    pipeline.Start(items, cancelToken, access_token);
+
+                    int count = items.Count();
+                    int i = 0;
+                    foreach (var item in pipeline.Output.GetConsumingEnumerable())
+                    {
+                        WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
+                    }
+
+                    foreach (var tuple in pipeline.Errors)
+                    {
+                        WriteError(new ErrorRecord(tuple.Item2, tuple.Item2.Message, ErrorCategory.ReadError, tuple.Item1));
+                    }
                 }
-
-                //using (var objects = new Stage<dynamic, dynamic>(() => contents.items))
-                //using (var downloads = new Stage<dynamic, Tuple<dynamic, string>>(() => objects.Output.GetConsumingEnumerable(), d =>
-                //    {
-                //        Task<Tuple<dynamic, string>> task = ExportObject(d);
-                //        task.Wait();
-                //        return task.Result;
-                //    }))
-                //{
-                //    var tasks = new Task[] 
-                //    {
-                //        Task.Run(() => objects.Start()),
-                //        Task.Run(() => downloads.Start()),
-                //    };
-
-                //    int count = items.Count();
-                //    int i = 0;
-                //    foreach (var item in downloads.Output.GetConsumingEnumerable())
-                //    {
-                //        WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
-                //    }
-                //}
-                // ExportObjects(contents.items);
             }
             catch (HaltCommandException)
             {
@@ -95,23 +76,6 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
-        }
-
-
-        private async Task<Tuple<dynamic, string>> ExportObject(dynamic item)
-        {
-            var path = Path.Combine(Destination, item.name);
-            if (!Force && File.Exists(path))
-            {
-                throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
-            }
-
-            var downloader = new FileDownloader(item.mediaLink, path, item.contentType);
-            var cancelToken = GetCancellationToken();
-            var access_token = await GetAccessToken(cancelToken);
-            await downloader.Download(cancelToken, access_token);
-
-            return new Tuple<dynamic, string>(item, path);
         }
 
         private void SaveMetaData(dynamic item)
