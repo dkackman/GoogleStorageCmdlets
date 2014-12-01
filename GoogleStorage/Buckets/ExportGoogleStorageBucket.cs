@@ -17,7 +17,7 @@ namespace GoogleStorage.Buckets
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
-        [Parameter(Mandatory = true, Position = 2, ValueFromPipelineByPropertyName = true)]
+        [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string Destination { get; set; }
 
         [Parameter(Mandatory = false)]
@@ -25,9 +25,6 @@ namespace GoogleStorage.Buckets
 
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
-
-        [Parameter(Mandatory = false)]
-        public SwitchParameter BreakOnError { get; set; }
 
         protected override void ProcessRecord()
         {
@@ -39,13 +36,17 @@ namespace GoogleStorage.Buckets
                 var cancelToken = GetCancellationToken();
                 var accessTask = GetAccessToken(cancelToken);
                 var access_token = accessTask.Result;
-
                 IEnumerable<dynamic> items = contents.items;
-                using (var pipeline = new DownloadPipline()
+
+                if (IncludeMetaData)
                 {
-                    Destination = Destination,
-                    Force = Force
-                })
+                    foreach (var item in items)
+                    {
+                        SaveMetaData(item);
+                    }
+                }
+
+                using (var pipeline = new DownloadPipline() { Destination = Destination, Force = Force })
                 {
                     pipeline.Start(items, cancelToken, access_token);
 
