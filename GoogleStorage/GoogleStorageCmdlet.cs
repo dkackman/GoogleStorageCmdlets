@@ -22,13 +22,13 @@ namespace GoogleStorage
                 IDictionary<string, object> d = o as IDictionary<string, object>;
                 Debug.Assert(d != null); 
                 
-                if (!d.ContainsKey(propertyName))
+                if (d.ContainsKey(propertyName))
                 {
-                    throw new InvalidOperationException(string.Format("Property {0} does not exist on result object", propertyName));
+                    WriteObject(d[propertyName]);
                 }
                 else
                 {
-                    WriteObject(d[propertyName]);
+                    throw new InvalidOperationException(string.Format("Property {0} does not exist on result object", propertyName));
                 }
             }
         }
