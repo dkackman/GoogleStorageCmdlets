@@ -106,17 +106,6 @@ namespace GoogleStorage
             storage.RemoveObject(name);
         }
 
-        protected bool AssertVariableValue(string name, string message)
-        {
-            if (GetVariableValue(name, null) == null)
-            {
-                WriteError(new ErrorRecord(new InvalidOperationException(message), message, ErrorCategory.ObjectNotFound, null));
-                return false;
-            }
-
-            return true;
-        }
-
         protected CancellationToken GetCancellationToken()
         {
             if (_cancelTokenSource == null)

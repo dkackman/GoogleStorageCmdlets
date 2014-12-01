@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Security;
 
