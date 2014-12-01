@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Diagnostics;
 
 namespace GoogleStorage.ProducerConsumer
 {
-    class DownloadPipline :IDisposable
+    class DownloadPipline : IDisposable
     {
         private BlockingCollection<dynamic> _objects = new BlockingCollection<dynamic>(10);
 
@@ -43,12 +40,12 @@ namespace GoogleStorage.ProducerConsumer
                     }
 
                     _objects.CompleteAdding();
-                });
+                }, cancelToken);
 
             // this is teh delgate that does the downloading
             Action download = () =>
                 {
-                    foreach (var item in _objects.GetConsumingEnumerable())
+                    foreach (var item in _objects.GetConsumingEnumerable(cancelToken))
                     {
                         try
                         {
@@ -68,12 +65,12 @@ namespace GoogleStorage.ProducerConsumer
                     Task[] tasks = new Task[ThreadCount];
                     for (int i = 0; i < tasks.Length; i++)
                     {
-                        tasks[i] = Task.Run(download);
+                        tasks[i] = Task.Run(download, cancelToken);
                     }
 
-                    Task.WaitAll(tasks);
+                    Task.WaitAll(tasks, cancelToken);
                     Output.CompleteAdding(); // this signals the calling thread that work is done
-                });
+                }, cancelToken);
         }
 
         private async Task<Tuple<dynamic, string>> ExportObject(dynamic item, CancellationToken cancelToken, string access_token)
