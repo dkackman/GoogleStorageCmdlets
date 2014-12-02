@@ -35,5 +35,7 @@ namespace DynamicRestProxy.PortableHttpClient
         /// The Auth scheme used for AuthToken
         /// </summary>
         public string AuthScheme { get; set; }
+
+        public string UserAgent { get; set; }
     }
 }
