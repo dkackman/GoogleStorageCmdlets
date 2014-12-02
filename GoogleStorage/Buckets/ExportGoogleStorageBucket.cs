@@ -46,7 +46,7 @@ namespace GoogleStorage.Buckets
                     }
                 }
 
-                using (var pipeline = new DownloadPipline() { Destination = Destination, Force = Force })
+                using (var pipeline = new DownloadPipline() { Destination = Destination, Force = Force, UserAgent = GoogleStorageCmdlet.UserAgent })
                 {
                     pipeline.Start(items, cancelToken, access_token);
 

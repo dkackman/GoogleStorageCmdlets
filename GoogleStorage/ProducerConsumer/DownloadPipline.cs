@@ -21,6 +21,8 @@ namespace GoogleStorage.ProducerConsumer
 
         public int ThreadCount { get; set; }
 
+        public string UserAgent { get; set; }
+
         public DownloadPipline()
         {
             ThreadCount = 5;
@@ -81,7 +83,7 @@ namespace GoogleStorage.ProducerConsumer
                 throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
             }
 
-            var downloader = new FileDownloader(item.mediaLink, path, item.contentType);
+            var downloader = new FileDownloader(item.mediaLink, path, item.contentType, UserAgent);
 
             await downloader.Download(cancelToken, access_token);
 

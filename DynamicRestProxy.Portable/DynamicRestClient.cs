@@ -96,6 +96,11 @@ namespace DynamicRestProxy.PortableHttpClient
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/json"));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/x-json"));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/javascript"));
+            
+            if (handler.SupportsTransferEncodingChunked())
+            {
+                client.DefaultRequestHeaders.TransferEncodingChunked = true;
+            }
 
             if (_defaults != null)
             {
@@ -104,7 +109,7 @@ namespace DynamicRestProxy.PortableHttpClient
                 {
                     client.DefaultRequestHeaders.UserAgent.Clear();
                     client.DefaultRequestHeaders.UserAgent.Add(productHeader);
-                }
+                }               
 
                 foreach (var kvp in _defaults.DefaultHeaders)
                 {

@@ -16,11 +16,14 @@ namespace GoogleStorage
 
         public string ContentType { get; private set; }
 
-        public FileDownloader(string source, string destination, string contentType)
+        public string UserAgent { get; private set; }
+        
+        public FileDownloader(string source, string destination, string contentType, string userAgent)
         {
             Source = source;
             Destination = destination;
             ContentType = contentType;
+            UserAgent = userAgent;
         }
 
         public async Task Download(CancellationToken cancelToken, string access_token)
@@ -34,12 +37,19 @@ namespace GoogleStorage
             if (handler.SupportsAutomaticDecompression)
             {
                 handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            }
+            }           
 
             using (var client = new HttpClient(handler, true))
             {
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
+                
+                ProductInfoHeaderValue productHeader = null;
+                if (!string.IsNullOrEmpty(UserAgent) && ProductInfoHeaderValue.TryParse(UserAgent, out productHeader))
+                {
+                    client.DefaultRequestHeaders.UserAgent.Clear();
+                    client.DefaultRequestHeaders.UserAgent.Add(productHeader);
+                }
 
                 if (handler.SupportsTransferEncodingChunked())
                 {

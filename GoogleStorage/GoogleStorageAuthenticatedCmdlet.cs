@@ -19,12 +19,17 @@ namespace GoogleStorage
 
         protected DynamicRestClient CreateClient()
         {
+            var defaults = new DynamicRestClientDefaults()
+            {
+                UserAgent = GoogleStorageCmdlet.UserAgent
+            };
+
             if (NoAuth)
             {
-                return new DynamicRestClient("https://www.googleapis.com/");
+                return new DynamicRestClient("https://www.googleapis.com/", defaults);
             }
 
-            return new DynamicRestClient("https://www.googleapis.com/", null, async (request, cancelToken) =>
+            return new DynamicRestClient("https://www.googleapis.com/", defaults, async (request, cancelToken) =>
             {
                 var accessToken = await GetAccessToken(cancelToken);
                 request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", accessToken);
