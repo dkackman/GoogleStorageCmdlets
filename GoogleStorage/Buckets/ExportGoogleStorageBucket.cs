@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Collections.Generic;
 
-using Newtonsoft.Json;
-
 using GoogleStorage.ProducerConsumer;
 
 namespace GoogleStorage.Buckets
@@ -38,15 +36,13 @@ namespace GoogleStorage.Buckets
                 var access_token = accessTask.Result;
                 IEnumerable<dynamic> items = contents.items;
 
-                if (IncludeMetaData)
+                using (var pipeline = new DownloadPipline()
                 {
-                    foreach (var item in items)
-                    {
-                        SaveMetaData(item);
-                    }
-                }
-
-                using (var pipeline = new DownloadPipline() { Destination = Destination, Force = Force, UserAgent = GoogleStorageCmdlet.UserAgent })
+                    Destination = Destination,
+                    Force = Force,
+                    UserAgent = GoogleStorageCmdlet.UserAgent,
+                    IncludeMetaData = IncludeMetaData
+                })
                 {
                     pipeline.Start(items, cancelToken, access_token);
 
@@ -76,29 +72,6 @@ namespace GoogleStorage.Buckets
             catch (Exception e)
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
-            }
-        }
-
-        private void SaveMetaData(dynamic item)
-        {
-            // build out the folder strucutre that might be embedded in the item name
-            Directory.CreateDirectory(Path.Combine(Destination, Path.GetDirectoryName(item.name)));
-
-            string path = Path.Combine(Destination, item.name + ".json");
-
-            if (!Force && File.Exists(path))
-            {
-                WriteVerbose(string.Format("{0} exists. Skipping", path));
-            }
-            else
-            {
-                WriteVerbose(string.Format("Saving {0} metadata", item.name));
-
-                using (var writer = new StreamWriter(path))
-                {
-                    string json = JsonConvert.SerializeObject(item);
-                    writer.Write(json);
-                }
             }
         }
 

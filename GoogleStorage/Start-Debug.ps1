@@ -24,7 +24,7 @@ Import-Module GoogleStorage
 #Get-GoogleStorageBucket -bucket uspto-pair -NoAuth -ListContents | out-host -paging
 #Get-GoogleStorageBuckets -Project direct-link-612 
 
-export-googlestoragebucket uspto-pair c:\storage -noauth -force -verbose
+export-googlestoragebucket uspto-pair c:\storage -noauth -force -verbose -includemetadata
 
 # Happy debugging :-)
 

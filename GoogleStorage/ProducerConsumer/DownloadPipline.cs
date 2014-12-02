@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.IO;
 
+using Newtonsoft.Json;
+
 namespace GoogleStorage.ProducerConsumer
 {
     class DownloadPipline : IDisposable
@@ -22,6 +24,8 @@ namespace GoogleStorage.ProducerConsumer
         public int ThreadCount { get; set; }
 
         public string UserAgent { get; set; }
+
+        public bool IncludeMetaData { get; set; }
 
         public DownloadPipline()
         {
@@ -77,7 +81,10 @@ namespace GoogleStorage.ProducerConsumer
 
         private async Task<Tuple<dynamic, string>> ExportObject(dynamic item, CancellationToken cancelToken, string access_token)
         {
-            var path = Path.Combine(Destination, item.name);
+            // build out the folder strucutre that might be embedded in the item name
+            Directory.CreateDirectory(Path.Combine(Destination, Path.GetDirectoryName(item.name)));
+
+            string path = Path.Combine(Destination, item.name);
             if (!Force && File.Exists(path))
             {
                 throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
@@ -87,7 +94,27 @@ namespace GoogleStorage.ProducerConsumer
 
             await downloader.Download(cancelToken, access_token);
 
-            return new Tuple<dynamic, string>(item, path);
+            if (IncludeMetaData)
+            {
+                SaveMetaData(item);
+            }
+
+            return new Tuple<dynamic, string>(item, path.Replace('/', Path.DirectorySeparatorChar));
+        }
+
+        private void SaveMetaData(dynamic item)
+        {
+            string path = Path.Combine(Destination, item.name + ".json");
+            if (!Force && File.Exists(path))
+            {
+                throw new InvalidOperationException(string.Format("The file {0} already exists. Use -Force to overwrite existing files", path));
+            }
+
+            using (var writer = new StreamWriter(path))
+            {
+                string json = JsonConvert.SerializeObject(item);
+                writer.Write(json);
+            }
         }
 
         public void Dispose()
