@@ -51,14 +51,16 @@ namespace GoogleStorage
 
             if (access == null)
             {
-                throw new AccessViolationException("Access token not set. Call Grant-GoogleStorageAuth first");
+                throw new AccessViolationException("Access token not set. Call Grant-GoogleStorageAccess first");
             }
 
             if (DateTime.UtcNow >= access.expiry)
             {
                 var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
                 access = await oauth.RefreshAccessToken(access, GetConfig(), cancelToken);
-                SetPersistedVariableValue("access", access, Persist);
+                
+                var storage = new PersistantStorage();
+                SetPersistedVariableValue("access", access, Persist || storage.ObjectExists("access")); // re-persist access token if already saved
             }
 
             SecureString token = access.access_token;

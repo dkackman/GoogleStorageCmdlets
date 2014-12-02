@@ -46,7 +46,7 @@ namespace GoogleStorage
             try
             {
                 using (var storage = GetStorage())
-                using (var file = storage.OpenFile(name, FileMode.Open, FileAccess.Read))
+                using (var file = storage.OpenFile(name, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var reader = new StreamReader(file))
                 {
                     string json = reader.ReadToEnd();
@@ -75,7 +75,7 @@ namespace GoogleStorage
             }
 
             using (var storage = GetStorage())
-            using (var stream = storage.OpenFile(name, FileMode.Create, FileAccess.Write))
+            using (var stream = storage.OpenFile(name, FileMode.Create, FileAccess.Write, FileShare.None))
             using (var writer = new StreamWriter(stream))
             {
                 // ensure we serialize the secure string as encrypted
@@ -90,7 +90,7 @@ namespace GoogleStorage
         }
 
         /// <summary>
-        /// This guy is user to ensure that secure strings get serilized as encrypted values
+        /// This guy is used to ensure that secure strings get serilized as encrypted values
         /// Deserializers, because we are using dynamic objects, will need to know what properties to convert back to secure strings
         /// </summary>
         class SecureStringConverter : JsonConverter
@@ -103,12 +103,15 @@ namespace GoogleStorage
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
             {
                 SecureString s = value as SecureString;
-                serializer.Serialize(writer, s.ToEncyptedString());
+                if (s != null)
+                {
+                    serializer.Serialize(writer, s.ToEncyptedString());
+                }
             }
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                // this will never be called because we are not deserializing to type objects
+                // this will never be called because we are not deserializing to typed objects
                 throw new NotImplementedException();
             }
         }

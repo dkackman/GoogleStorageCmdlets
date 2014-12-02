@@ -45,10 +45,15 @@ namespace GoogleStorage.Buckets
                     IncludeMetaData = IncludeMetaData
                 })
                 {
+                    // this kicks off a number of async tasks that will do the downloads
                     pipeline.Start(items, cancelToken, access_token);
 
                     int count = items.Count();
                     int i = 0;
+
+                    // those tasks populate this blocking collection
+                    // it will block until all of the tasks are complete 
+                    // at which point we know the background threads are done and the enumeration will complete
                     foreach (var item in pipeline.Output.GetConsumingEnumerable(cancelToken))
                     {
                         WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
