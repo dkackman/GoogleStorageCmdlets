@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Collections.Generic;
@@ -28,10 +29,10 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var t = GetBucketContents();
+                var cancelToken = GetCancellationToken();
+                var t = GetBucketContents(cancelToken);
                 var contents = t.Result;
 
-                var cancelToken = GetCancellationToken();
                 var accessTask = GetAccessToken(cancelToken);
                 var access_token = accessTask.Result;
                 IEnumerable<dynamic> items = contents.items;
@@ -48,7 +49,7 @@ namespace GoogleStorage.Buckets
 
                     int count = items.Count();
                     int i = 0;
-                    foreach (var item in pipeline.Output.GetConsumingEnumerable())
+                    foreach (var item in pipeline.Output.GetConsumingEnumerable(cancelToken))
                     {
                         WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
                     }
@@ -75,11 +76,11 @@ namespace GoogleStorage.Buckets
             }
         }
 
-        private async Task<dynamic> GetBucketContents()
+        private async Task<dynamic> GetBucketContents(CancellationToken cancelToken)
         {
             dynamic google = CreateClient();
 
-            return await google.storage.v1.b(Bucket).o.get(GetCancellationToken());
+            return await google.storage.v1.b(Bucket).o.get(cancelToken);
         }
     }
 }
