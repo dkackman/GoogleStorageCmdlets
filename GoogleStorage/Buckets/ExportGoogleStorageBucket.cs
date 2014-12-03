@@ -47,10 +47,27 @@ namespace GoogleStorage.Buckets
                     // as items are added to the Input queue
                     pipeline.Start(cancelToken, access_token);
 
+                    bool yesToAll = false;
+                    bool noToAll = false;
                     foreach (var item in items)
                     {
                         string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
-                        pipeline.Input.Add(new Tuple<dynamic, string>(item, path), cancelToken);
+                        var tuple = new Tuple<dynamic, string>(item, path);
+                        if (File.Exists(path)) // if the file exists confirm the overwrite
+                        {
+                            if (ShouldProcess(path, "overwrite"))
+                            {
+                                var msg = string.Format("Do you want to overwrite the file {0}?", path);
+                                if (Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll))
+                                {
+                                    pipeline.Input.Add(tuple, cancelToken);
+                                }
+                            }                            
+                        }
+                        else
+                        {
+                            pipeline.Input.Add(tuple, cancelToken);
+                        }
                     }
                     pipeline.Input.CompleteAdding();
 
@@ -86,7 +103,7 @@ namespace GoogleStorage.Buckets
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
         }
-
+        
         private async Task<dynamic> GetBucketContents(CancellationToken cancelToken)
         {
             dynamic google = CreateClient();
