@@ -10,7 +10,7 @@ using GoogleStorage.ProducerConsumer;
 
 namespace GoogleStorage.Buckets
 {
-    [Cmdlet(VerbsData.Export, "GoogleStorageBucket")]
+    [Cmdlet(VerbsData.Export, "GoogleStorageBucket", SupportsShouldProcess = true)]
     public class ExportGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
@@ -39,14 +39,20 @@ namespace GoogleStorage.Buckets
 
                 using (var pipeline = new DownloadPipline()
                 {
-                    Destination = Destination,
-                    Force = Force,
                     UserAgent = GoogleStorageCmdlet.UserAgent,
                     IncludeMetaData = IncludeMetaData
                 })
                 {
                     // this kicks off a number of async tasks that will do the downloads
-                    pipeline.Start(items, cancelToken, access_token);
+                    // as items are added to the Input queue
+                    pipeline.Start(cancelToken, access_token);
+
+                    foreach (var item in items)
+                    {
+                        string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
+                        pipeline.Input.Add(new Tuple<dynamic, string>(item, path), cancelToken);
+                    }
+                    pipeline.Input.CompleteAdding();
 
                     int count = items.Count();
                     int i = 0;
