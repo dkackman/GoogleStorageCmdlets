@@ -32,14 +32,14 @@ namespace GoogleStorage.ProducerConsumer
 
         public void Start(CancellationToken cancelToken, string access_token)
         {
-            // this is the delgate that does the downloading
+            // this is the delegate that does the downloading
             Action download = () =>
                 {
                     foreach (var item in Input.GetConsumingEnumerable(cancelToken))
                     {
                         try
                         {
-                            Task<Tuple<dynamic, string>> exportTask = ExportObject(item, cancelToken, access_token);
+                            var exportTask = ExportObject(item, cancelToken, access_token);
                             Output.Add(exportTask.Result);
                         }
                         catch (Exception e)
@@ -65,9 +65,6 @@ namespace GoogleStorage.ProducerConsumer
 
         private async Task<Tuple<dynamic, string>> ExportObject(Tuple<dynamic, string> item, CancellationToken cancelToken, string access_token)
         {
-            // build out the folder strucutre that might be embedded in the item name
-            Directory.CreateDirectory(Path.GetDirectoryName(item.Item2));
-
             var downloader = new FileDownloader(item.Item1.mediaLink, item.Item2, item.Item1.contentType, UserAgent);
 
             await downloader.Download(cancelToken, access_token);

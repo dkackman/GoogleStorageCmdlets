@@ -28,6 +28,7 @@ namespace GoogleStorage
 
         public async Task Download(CancellationToken cancelToken, string access_token)
         {
+            // build out the folder strucutre that might be embedded in the item name
             Directory.CreateDirectory(Path.GetDirectoryName(Destination));
 
             var uri = new Uri(Source);
