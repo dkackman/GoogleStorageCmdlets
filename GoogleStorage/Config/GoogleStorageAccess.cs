@@ -24,18 +24,16 @@ namespace GoogleStorage.Config
                 WriteWarning("This action requires authorization with Google Storage");
                 if (!ShowBrowser)
                 {
-                    WriteObject("Navigate to this Url in a web browser:");
+                    WriteVerbose("Navigate to this Url in a web browser:");
                     WriteObject(confirmToken.verification_url);
-                    WriteObject("");
                 }
                 else
                 {
                     Process.Start((string)confirmToken.verification_url);
                 }
 
-                WriteObject("Enter this code in the authorize web page to grant access to Google Storage");
+                WriteVerbose("Enter this code in the authorize web page to grant access to Google Storage");
                 WriteObject(confirmToken.user_code);
-                WriteObject("");
 
                 WriteVerbose("Waiting for authorization...");
 
