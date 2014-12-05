@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Diagnostics;
@@ -18,7 +19,10 @@ namespace GoogleStorage.Config
         {
             try
             {
-                var startTask = StartAuth();
+                dynamic config = GetConfig();
+                var cancelToken = GetCancellationToken();
+
+                var startTask = StartAuth(config, cancelToken);
                 var confirmToken = startTask.Result;
 
                 WriteWarning("This action requires authorization with Google Storage");
@@ -37,7 +41,7 @@ namespace GoogleStorage.Config
 
                 WriteVerbose("Waiting for authorization...");
 
-                var confirmTask = ConfirmAuth(confirmToken);
+                var confirmTask = ConfirmAuth(confirmToken, config, cancelToken);
                 var access = confirmTask.Result;
 
                 SetPersistedVariableValue("access", access, Persist);
@@ -59,17 +63,17 @@ namespace GoogleStorage.Config
             }
         }
 
-        private async Task<dynamic> ConfirmAuth(dynamic response)
+        private static async Task<dynamic> ConfirmAuth(dynamic response, dynamic config, CancellationToken cancelToken)
         {
             var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
-            dynamic access = await oauth.WaitForConfirmation(response, GetConfig(), GetCancellationToken());
+            dynamic access = await oauth.WaitForConfirmation(response, config, cancelToken);
             return access;
         }
 
-        private async Task<dynamic> StartAuth()
+        private static async Task<dynamic> StartAuth(dynamic config, CancellationToken cancelToken)
         {
             var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
-            dynamic response = await oauth.StartAuthentication(GetConfig(), GetCancellationToken());
+            dynamic response = await oauth.StartAuthentication(config, cancelToken);
             return response;
         }
     }
