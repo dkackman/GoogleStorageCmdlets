@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buckets\ExportGoogleStorageBucket.cs" />
+    <Compile Include="Buckets\FindGoogleStorageBucket.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FileDownloader.cs" />
     <Compile Include="GoogleOAuth2.cs" />
