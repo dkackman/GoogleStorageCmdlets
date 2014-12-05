@@ -36,7 +36,7 @@ namespace GoogleStorage.Config
                     Process.Start((string)confirmToken.verification_url);
                 }
 
-                WriteVerbose("Enter this code in the authorize web page to grant access to Google Storage");
+                WriteVerbose("Enter this code in the authorization web page to grant access to Google Storage to the Google Storage Cmdlets");
                 WriteObject(confirmToken.user_code);
 
                 WriteVerbose("Waiting for authorization...");
