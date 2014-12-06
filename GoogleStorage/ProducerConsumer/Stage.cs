@@ -44,7 +44,7 @@ namespace GoogleStorage.ProducerConsumer
                         }
                         catch (AggregateException e)
                         {
-                            foreach(var ex in e.InnerExceptions)
+                            foreach (var ex in e.InnerExceptions)
                             {
                                 Errors.Add(Tuple.Create(item, ex));
                             }

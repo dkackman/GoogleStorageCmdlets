@@ -31,6 +31,7 @@ namespace GoogleStorage.Buckets
                         if (verbose)
                         {
                             WriteDynamicObject(item, DisplayProperty);
+                            WriteVerbose("");
                         }
                         else
                         {
