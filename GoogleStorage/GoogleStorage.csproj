@@ -52,6 +52,7 @@
     <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Buckets\AddGoogleStorageBucket.cs" />
     <Compile Include="Buckets\ExportGoogleStorageBucket.cs" />
     <Compile Include="Buckets\FindGoogleStorageBucket.cs" />
     <Compile Include="Extensions.cs" />
