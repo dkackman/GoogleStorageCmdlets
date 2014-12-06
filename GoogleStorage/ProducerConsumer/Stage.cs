@@ -8,13 +8,13 @@ using Newtonsoft.Json;
 
 namespace GoogleStorage.ProducerConsumer
 {
-    class DownloadPipline : IDisposable
+    class Stage<TInput, TOutput> : IDisposable
     {
         public BlockingCollection<Tuple<dynamic, string>> Input { get; private set; }
 
-        public ConcurrentBag<Tuple<dynamic, Exception>> Errors { get; private set; }
-
         public BlockingCollection<Tuple<dynamic, string>> Output { get; private set; }
+
+        public ConcurrentBag<Tuple<Tuple<dynamic, string>, Exception>> Errors { get; private set; }
 
         public int ThreadCount { get; set; }
 
@@ -22,12 +22,12 @@ namespace GoogleStorage.ProducerConsumer
 
         public bool IncludeMetaData { get; set; }
 
-        public DownloadPipline()
+        public Stage()
         {
             ThreadCount = 5;
             Input = new BlockingCollection<Tuple<dynamic, string>>();
             Output = new BlockingCollection<Tuple<dynamic, string>>();
-            Errors = new ConcurrentBag<Tuple<dynamic, Exception>>();
+            Errors = new ConcurrentBag<Tuple<Tuple<dynamic, string>, Exception>>();
         }
 
         public void Start(CancellationToken cancelToken, string access_token)
@@ -42,9 +42,16 @@ namespace GoogleStorage.ProducerConsumer
                             var exportTask = ExportObject(item, cancelToken, access_token);
                             Output.Add(exportTask.Result);
                         }
+                        catch (AggregateException e)
+                        {
+                            foreach(var ex in e.InnerExceptions)
+                            {
+                                Errors.Add(Tuple.Create(item, ex));
+                            }
+                        }
                         catch (Exception e)
                         {
-                            Errors.Add(Tuple.Create(item.Item1, e));
+                            Errors.Add(Tuple.Create(item, e));
                         }
                     }
                 };

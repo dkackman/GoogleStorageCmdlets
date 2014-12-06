@@ -37,7 +37,7 @@ namespace GoogleStorage.Buckets
                 var access_token = accessTask.Result;
                 IEnumerable<dynamic> items = contents.items;
 
-                using (var pipeline = new DownloadPipline()
+                using (var pipeline = new Stage<Tuple<dynamic, string>, Tuple<dynamic, string>>()
                 {
                     UserAgent = GoogleStorageCmdlet.UserAgent,
                     IncludeMetaData = IncludeMetaData
@@ -62,7 +62,7 @@ namespace GoogleStorage.Buckets
                                 {
                                     pipeline.Input.Add(tuple, cancelToken);
                                 }
-                            }                            
+                            }
                         }
                         else
                         {
@@ -84,7 +84,7 @@ namespace GoogleStorage.Buckets
 
                     foreach (var tuple in pipeline.Errors)
                     {
-                        WriteError(new ErrorRecord(tuple.Item2, tuple.Item2.Message, ErrorCategory.ReadError, tuple.Item1));
+                        WriteError(new ErrorRecord(tuple.Item2, tuple.Item2.Message, ErrorCategory.ReadError, tuple.Item1.Item1));
                     }
                 }
             }
@@ -103,7 +103,7 @@ namespace GoogleStorage.Buckets
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
         }
-        
+
         private async Task<dynamic> GetBucketContents(CancellationToken cancelToken)
         {
             dynamic google = CreateClient();
