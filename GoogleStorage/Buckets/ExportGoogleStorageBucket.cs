@@ -37,12 +37,13 @@ namespace GoogleStorage.Buckets
                     // this is the delgate that does the downloading
                     Func<Tuple<dynamic, string>, Tuple<dynamic, string>> func = (input) =>
                         {
-                            Task<Tuple<dynamic, string>> task = api.ExportObject(input, IncludeMetaData);
-                            return task.Result;
+                            Task task = api.ExportObject(input, IncludeMetaData);
+                            task.Wait(api.CancellationToken);
+                            return input;
                         };
 
-                    // this kicks off a number of async tasks that will do the downloads
-                    // as items are added to the Input queue
+                    // this kicks off a number of async tasks that will do 
+                    // the downloads as items are added to the Input queue
                     downloadPipeline.Start(func, api.CancellationToken);
 
                     bool yesToAll = false;
@@ -75,7 +76,7 @@ namespace GoogleStorage.Buckets
                     int count = items.Count();
                     int i = 0;
 
-                    // those tasks populate this blocking collection
+                    // the tasks above populate this blocking collection
                     // it will block until all of the tasks are complete 
                     // at which point we know the background threads are done and the enumeration will complete
                     foreach (var item in downloadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))

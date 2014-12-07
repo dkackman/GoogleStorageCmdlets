@@ -36,7 +36,11 @@ namespace GoogleStorage
             _googleStorage = CreateClient().storage.v1;
         }
 
-        public async Task<Tuple<dynamic, string>> ExportObject(Tuple<dynamic, string> item, bool includeMetaData)
+        public async Task ImportObject(Tuple<string, string> item)
+        {
+        }
+
+        public async Task ExportObject(Tuple<dynamic, string> item, bool includeMetaData)
         {
             var downloader = new FileDownloader(item.Item1.mediaLink, item.Item2, item.Item1.contentType, UserAgent);
 
@@ -50,8 +54,6 @@ namespace GoogleStorage
                     writer.Write(json);
                 }
             }
-
-            return item;
         }
 
         public async Task<dynamic> GetBuckets()
@@ -63,7 +65,7 @@ namespace GoogleStorage
         {
             return await _googleStorage.b(bucket).get(CancellationToken);
         }
-        
+
         public async Task<dynamic> GetBucketContents(string bucket)
         {
             return await _googleStorage.b(bucket).o.get(CancellationToken);
@@ -87,8 +89,8 @@ namespace GoogleStorage
             var defaults = new DynamicRestClientDefaults()
             {
                 UserAgent = UserAgent
-            }; 
-            
+            };
+
             if (string.IsNullOrEmpty(access_token))
             {
                 return new DynamicRestClient("https://www.googleapis.com/", defaults);
