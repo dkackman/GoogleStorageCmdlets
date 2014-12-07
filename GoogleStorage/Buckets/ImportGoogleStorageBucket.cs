@@ -30,7 +30,7 @@ namespace GoogleStorage.Buckets
                     {
                         Task<dynamic> task = api.ImportObject(input.Item1, input.Item2);
                         task.Wait(api.CancellationToken);
-                        return new Tuple<FileInfo, dynamic>(input.Item1,  task.Result);
+                        return new Tuple<FileInfo, dynamic>(input.Item1, task.Result);
                     };
 
                     // this kicks off a number of async tasks that will do the downloads
@@ -42,12 +42,26 @@ namespace GoogleStorage.Buckets
 
                     int count = 0;
                     var files = new FileEnumerator(Source, "*.*");
-                    foreach (var file in files.GetFiles())
+                    if (ShouldProcess(Source, "import"))
                     {
-                        if (ShouldProcess(file.Name, "imort"))
+                        foreach (var file in files.GetFiles())
                         {
-                            uploadPipeline.Input.Add(Tuple.Create(file, file.Name), api.CancellationToken);
-                            count++;
+                            var name = file.Name;
+                            if (!yesToAll && !Force && RemoteFileExists(api, name))
+                            {
+                                var msg = string.Format("Do you want to overwrite the file {0}?", name);
+
+                                if (Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll))
+                                {
+                                    uploadPipeline.Input.Add(Tuple.Create(file, name), api.CancellationToken);
+                                    count++;
+                                }
+                            }
+                            else
+                            {
+                                uploadPipeline.Input.Add(Tuple.Create(file, name), api.CancellationToken);
+                                count++;
+                            }
                         }
                     }
 
@@ -84,6 +98,12 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
+        }
+
+        private bool RemoteFileExists(GoogleStorageApi api, string name)
+        {
+            Task<bool> exists = api.FindObject(Bucket, name);
+            return exists.Result;
         }
     }
 }

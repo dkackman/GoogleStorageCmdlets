@@ -48,13 +48,13 @@ namespace GoogleStorage.Buckets
 
                     bool yesToAll = false;
                     bool noToAll = false;
-                    foreach (var item in items)
+                    if (ShouldProcess(Bucket, "export"))
                     {
-                        string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
-                        var tuple = new Tuple<dynamic, string>(item, path);
-                        if (File.Exists(path)) // if the file exists confirm the overwrite
+                        foreach (var item in items)
                         {
-                            if (ShouldProcess(path, "overwrite"))
+                            string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
+                            var tuple = new Tuple<dynamic, string>(item, path);
+                            if (File.Exists(path)) // if the file exists confirm the overwrite
                             {
                                 var msg = string.Format("Do you want to overwrite the file {0}?", path);
                                 if (Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll))
@@ -62,10 +62,10 @@ namespace GoogleStorage.Buckets
                                     downloadPipeline.Input.Add(tuple, api.CancellationToken);
                                 }
                             }
-                        }
-                        else
-                        {
-                            downloadPipeline.Input.Add(tuple, api.CancellationToken);
+                            else
+                            {
+                                downloadPipeline.Input.Add(tuple, api.CancellationToken);
+                            }
                         }
                     }
 
