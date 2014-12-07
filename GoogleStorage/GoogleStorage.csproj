@@ -62,6 +62,7 @@
     <Compile Include="Config\RevokeGoogleStorageAccess.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FileDownloader.cs" />
+    <Compile Include="FileEnumerator.cs" />
     <Compile Include="GoogleOAuth2.cs" />
     <Compile Include="Config\GrantGoogleStorageAccess.cs" />
     <Compile Include="GoogleStorageApi.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Buckets\GetGoogleStorageBucket.cs" />
     <Compile Include="Buckets\GetGoogleStorageBuckets.cs" />
     <Compile Include="GoogleStorageCmdlet.cs" />
+    <Compile Include="Objects\FindGoogleStorageObject.cs" />
     <Compile Include="Objects\UpdateGoogleStorageObject.cs" />
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="Stage.cs" />

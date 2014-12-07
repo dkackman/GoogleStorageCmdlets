@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Dynamic;
 using System.IO;
@@ -25,6 +26,7 @@ namespace GoogleStorage
         public CancellationToken CancellationToken { get; private set; }
 
         private dynamic _googleStorage;
+        private dynamic _googleStorageUpload;
 
         public GoogleStorageApi(string project, string agent, string token, CancellationToken cancelToken)
         {
@@ -33,11 +35,27 @@ namespace GoogleStorage
             access_token = token;
             CancellationToken = cancelToken;
 
-            _googleStorage = CreateClient().storage.v1;
+            dynamic client = CreateClient();
+            _googleStorage = client.storage.v1;
+            _googleStorageUpload = client.upload.storage.v1;
         }
 
-        public async Task ImportObject(Tuple<string, string> item)
+        public async Task<bool> FindObject(string bucket, string objectName)
         {
+            try
+            {
+                await GetObject(bucket, objectName);
+                return true;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<dynamic> GetObject(string bucket, string objectName)
+        {
+            return await _googleStorageUpload.b(bucket).o(objectName).get(CancellationToken);
         }
 
         public async Task<dynamic> UpdateObjectMetaData(string bucket, string objectName, string propertName, string propertyValue)
@@ -46,6 +64,14 @@ namespace GoogleStorage
             body.Add(propertName, propertyValue == "" ? null : propertyValue);
 
             return await _googleStorage.b(bucket).o(objectName).patch(CancellationToken, body, fields: propertName);
+        }
+
+        public async Task ImportObject(FileInfo file, string name)
+        {
+            using (var stream = new StreamInfo(file.OpenRead(), "image/png"))
+            {
+                dynamic result = await _googleStorageUpload.b.unit_tests.o.post(stream, name: new PostUrlParam(name), uploadType: new PostUrlParam("media"));
+            }
         }
 
         public async Task ExportObject(Tuple<dynamic, string> item, bool includeMetaData)
@@ -72,6 +98,19 @@ namespace GoogleStorage
         public async Task<dynamic> GetBucket(string bucket)
         {
             return await _googleStorage.b(bucket).get(CancellationToken);
+        }
+
+        public async Task<bool> FindBucket(string bucket)
+        {
+            try
+            {
+                await GetBucket(bucket);
+                return true;
+            }
+            catch(HttpRequestException)
+            {
+                return false;
+            }
         }
 
         public async Task<dynamic> GetBucketContents(string bucket)
