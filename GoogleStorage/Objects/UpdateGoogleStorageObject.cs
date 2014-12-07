@@ -15,7 +15,11 @@ namespace GoogleStorage.Objects
         [Parameter(Mandatory = true, Position = 2, ValueFromPipelineByPropertyName = true)]
         public string PropertyName { get; set; }
 
-        [Parameter(Mandatory = true, Position = 3, ValueFromPipelineByPropertyName = true)]
+        /// <summary>
+        /// The new value for the propety
+        /// Omit to clear the current value
+        /// </summary>
+        [Parameter(Mandatory = false, Position = 3, ValueFromPipelineByPropertyName = true)]
         public string PropertyValue { get; set; }
 
         [Parameter(Mandatory = false)]

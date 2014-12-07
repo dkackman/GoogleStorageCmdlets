@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
@@ -45,7 +43,7 @@ namespace GoogleStorage
         public async Task<dynamic> UpdateObjectMetaData(string bucket, string objectName, string propertName, string propertyValue)
         {
             IDictionary<string,object> body = new ExpandoObject();
-            body.Add(propertName, propertyValue);
+            body.Add(propertName, propertyValue == "" ? null : propertyValue);
 
             return await _googleStorage.b(bucket).o(objectName).patch(CancellationToken, body, fields: propertName);
         }
