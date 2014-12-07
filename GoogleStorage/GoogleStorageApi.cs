@@ -55,7 +55,7 @@ namespace GoogleStorage
 
         public async Task<dynamic> GetObject(string bucket, string objectName)
         {
-            return await _googleStorageUpload.b(bucket).o(objectName).get(CancellationToken);
+            return await _googleStorage.b(bucket).o(objectName).get(CancellationToken);
         }
 
         public async Task<dynamic> UpdateObjectMetaData(string bucket, string objectName, string propertName, string propertyValue)

@@ -71,6 +71,7 @@
     <Compile Include="Buckets\GetGoogleStorageBuckets.cs" />
     <Compile Include="GoogleStorageCmdlet.cs" />
     <Compile Include="Objects\FindGoogleStorageObject.cs" />
+    <Compile Include="Objects\GetGoogleStorageObject.cs" />
     <Compile Include="Objects\UpdateGoogleStorageObject.cs" />
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="Stage.cs" />

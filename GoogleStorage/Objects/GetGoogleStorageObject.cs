@@ -3,8 +3,8 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
-    [Cmdlet(VerbsCommon.Find, "GoogleStorageObject")]
-    public class FindGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
+    [Cmdlet(VerbsCommon.Get, "GoogleStorageObject")]
+    public class GetGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
@@ -17,7 +17,7 @@ namespace GoogleStorage.Objects
             try
             {
                 var api = CreateApiWrapper();
-                var t = api.FindObject(Bucket, ObjectName);
+                var t = api.GetObject(Bucket, ObjectName);
 
                 WriteObject(t.Result);
             }
