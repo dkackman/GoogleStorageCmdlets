@@ -2,10 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Net.Http.Headers;
 using System.Security;
-
-using DynamicRestProxy.PortableHttpClient;
 
 namespace GoogleStorage
 {
@@ -50,7 +47,7 @@ namespace GoogleStorage
 
             if (DateTime.UtcNow >= access.expiry)
             {
-                var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
+                var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
                 access = await oauth.RefreshAccessToken(access, GetConfig(), cancelToken);
                 
                 var storage = new PersistantStorage();

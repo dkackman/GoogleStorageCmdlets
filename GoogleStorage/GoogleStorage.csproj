@@ -69,6 +69,7 @@
     <Compile Include="Buckets\GetGoogleStorageBucket.cs" />
     <Compile Include="Buckets\GetGoogleStorageBuckets.cs" />
     <Compile Include="GoogleStorageCmdlet.cs" />
+    <Compile Include="Objects\UpdateGoogleStorageObject.cs" />
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="Stage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,9 +98,7 @@
       <Name>DynamicRestProxy.PortableHttpClient</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Objects\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy RemoteSigned -command "&amp; '$(ProjectDir)Post-Build.ps1' -ProjectName '$(ProjectName)' -ConfigurationName '$(ConfigurationName)' -TargetDir '$(TargetDir)'"</PostBuildEvent>

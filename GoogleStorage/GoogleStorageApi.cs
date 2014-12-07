@@ -16,6 +16,8 @@ namespace GoogleStorage
 {
     public class GoogleStorageApi
     {
+        public const string AuthScope = "https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/devstorage.read_write";
+
         public string Project { get; private set; }
 
         public string UserAgent { get; private set; }
@@ -38,6 +40,14 @@ namespace GoogleStorage
 
         public async Task ImportObject(Tuple<string, string> item)
         {
+        }
+
+        public async Task<dynamic> UpdateObjectMetaData(string bucket, string objectName, string propertName, string propertyValue)
+        {
+            IDictionary<string,object> body = new ExpandoObject();
+            body.Add(propertName, propertyValue);
+
+            return await _googleStorage.b(bucket).o(objectName).patch(CancellationToken, body, fields: propertName);
         }
 
         public async Task ExportObject(Tuple<dynamic, string> item, bool includeMetaData)

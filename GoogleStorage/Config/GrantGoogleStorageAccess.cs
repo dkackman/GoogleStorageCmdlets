@@ -65,14 +65,14 @@ namespace GoogleStorage.Config
 
         private static async Task<dynamic> ConfirmAuth(dynamic response, dynamic config, CancellationToken cancelToken)
         {
-            var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
+            var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
             dynamic access = await oauth.WaitForConfirmation(response, config, cancelToken);
             return access;
         }
 
         private static async Task<dynamic> StartAuth(dynamic config, CancellationToken cancelToken)
         {
-            var oauth = new GoogleOAuth2("https://www.googleapis.com/auth/devstorage.read_write");
+            var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
             dynamic response = await oauth.StartAuthentication(config, cancelToken);
             return response;
         }
