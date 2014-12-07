@@ -12,14 +12,26 @@ namespace GoogleStorage.Objects
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string ObjectName { get; set; }
 
+        [Parameter(Mandatory = false)]
+        public string DisplayProperty { get; set; }
+
         protected override void ProcessRecord()
         {
             try
             {
                 var api = CreateApiWrapper();
                 var t = api.GetObject(Bucket, ObjectName);
+                var item = t.Result;
 
-                WriteObject(t.Result);
+                bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
+                if (verbose)
+                {
+                    WriteDynamicObject(item, DisplayProperty);
+                }
+                else
+                {
+                    WriteObject(item.name);
+                }
             }
             catch (HaltCommandException)
             {

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Collections.Generic;
 
 namespace GoogleStorage.Buckets
 {
@@ -26,14 +23,14 @@ namespace GoogleStorage.Buckets
             {
                 var api = CreateApiWrapper();
 
-                using (var uploadPipeline = new Stage<Tuple<FileInfo, string>, Tuple<FileInfo, string>>())
+                using (var uploadPipeline = new Stage<Tuple<FileInfo, string>, Tuple<FileInfo, dynamic>>())
                 {
                     // this is the delgate that does the downloading
-                    Func<Tuple<FileInfo, string>, Tuple<FileInfo, string>> func = (input) =>
+                    Func<Tuple<FileInfo, string>, Tuple<FileInfo, dynamic>> func = (input) =>
                     {
-                        Task task = api.ImportObject(input.Item1, input.Item2);
+                        Task<dynamic> task = api.ImportObject(input.Item1, input.Item2);
                         task.Wait(api.CancellationToken);
-                        return input;
+                        return new Tuple<FileInfo, dynamic>(input.Item1,  task.Result);
                     };
 
                     // this kicks off a number of async tasks that will do the downloads
@@ -64,7 +61,7 @@ namespace GoogleStorage.Buckets
                     int i = 0;
                     foreach (var item in uploadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))
                     {
-                        WriteVerbose(string.Format("({0} of {1}) - Imported {2} to {3}", ++i, count, item.Item1.Name, item.Item2));
+                        WriteVerbose(string.Format("({0} of {1}) - Imported {2} to {3}", ++i, count, item.Item1.Name, item.Item2.name));
                     }
 
                     foreach (var tuple in uploadPipeline.Errors)

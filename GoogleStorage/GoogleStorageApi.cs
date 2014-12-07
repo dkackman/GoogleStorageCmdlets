@@ -25,8 +25,8 @@ namespace GoogleStorage
 
         public CancellationToken CancellationToken { get; private set; }
 
-        private dynamic _googleStorage;
-        private dynamic _googleStorageUpload;
+        private readonly dynamic _googleStorage;
+        private readonly dynamic _googleStorageUpload;
 
         public GoogleStorageApi(string project, string agent, string token, CancellationToken cancelToken)
         {
@@ -60,17 +60,17 @@ namespace GoogleStorage
 
         public async Task<dynamic> UpdateObjectMetaData(string bucket, string objectName, string propertName, string propertyValue)
         {
-            IDictionary<string,object> body = new ExpandoObject();
+            IDictionary<string, object> body = new ExpandoObject();
             body.Add(propertName, propertyValue == "" ? null : propertyValue);
 
             return await _googleStorage.b(bucket).o(objectName).patch(CancellationToken, body, fields: propertName);
         }
 
-        public async Task ImportObject(FileInfo file, string name)
+        public async Task<dynamic> ImportObject(FileInfo file, string name)
         {
             using (var stream = new StreamInfo(file.OpenRead(), "image/png"))
             {
-                dynamic result = await _googleStorageUpload.b.unit_tests.o.post(stream, name: new PostUrlParam(name), uploadType: new PostUrlParam("media"));
+                return await _googleStorageUpload.b.unit_tests.o.post(stream, name: new PostUrlParam(name), uploadType: new PostUrlParam("media"));
             }
         }
 
@@ -107,7 +107,7 @@ namespace GoogleStorage
                 await GetBucket(bucket);
                 return true;
             }
-            catch(HttpRequestException)
+            catch (HttpRequestException)
             {
                 return false;
             }
