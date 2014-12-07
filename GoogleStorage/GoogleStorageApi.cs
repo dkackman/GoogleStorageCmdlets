@@ -57,6 +57,11 @@ namespace GoogleStorage
             return await _googleStorage.b(bucket).o(objectName).get(CancellationToken);
         }
 
+        public async Task RemoveObject(string bucket, string objectName)
+        {
+            await _googleStorage.b(bucket).o(objectName).delete(CancellationToken);
+        }
+
         public async Task<dynamic> UpdateObjectMetaData(string bucket, string objectName, string propertName, string propertyValue)
         {
             IDictionary<string, object> body = new ExpandoObject();
@@ -117,9 +122,9 @@ namespace GoogleStorage
             return await _googleStorage.b(bucket).o.get(CancellationToken);
         }
 
-        public async Task<dynamic> RemoveBucket(string bucket)
+        public async Task RemoveBucket(string bucket)
         {
-            return await _googleStorage.b(bucket).delete(CancellationToken);
+            await _googleStorage.b(bucket).delete(CancellationToken);
         }
 
         public async Task<dynamic> AddBucket(string bucket)
