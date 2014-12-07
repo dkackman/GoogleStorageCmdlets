@@ -57,10 +57,13 @@
     <Compile Include="Buckets\FindGoogleStorageBucket.cs" />
     <Compile Include="Buckets\ImportGoogleStorageBucket.cs" />
     <Compile Include="Buckets\RemoveGoogleStorageBucket.cs" />
+    <Compile Include="Config\ClearClearGoogleStorageConfig.cs" />
+    <Compile Include="Config\GetGoogleStorageConfig.cs" />
+    <Compile Include="Config\RevokeGoogleStorageAccess.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FileDownloader.cs" />
     <Compile Include="GoogleOAuth2.cs" />
-    <Compile Include="Config\GoogleStorageAccess.cs" />
+    <Compile Include="Config\GrantGoogleStorageAccess.cs" />
     <Compile Include="GoogleStorageApi.cs" />
     <Compile Include="GoogleStorageAuthenticatedCmdlet.cs" />
     <Compile Include="Buckets\GetGoogleStorageBucket.cs" />
@@ -69,7 +72,7 @@
     <Compile Include="PersistantStorage.cs" />
     <Compile Include="Stage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Config\GoogleStorageConfig.cs" />
+    <Compile Include="Config\SetGoogleStorageConfig.cs" />
     <Compile Include="TestCmdlet.cs" />
   </ItemGroup>
   <ItemGroup>

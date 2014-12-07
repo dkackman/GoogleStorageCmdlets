@@ -77,13 +77,4 @@ namespace GoogleStorage.Config
             return response;
         }
     }
-
-    [Cmdlet(VerbsSecurity.Revoke, "GoogleStorageAccess")]
-    public class RevokeGoogleStorageAccess : GoogleStorageCmdlet
-    {
-        protected override void ProcessRecord()
-        {
-            ClearPersistedVariableValue("access");
-        }
-    }
 }
