@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
-namespace GoogleStorage.ProducerConsumer
+namespace GoogleStorage
 {
     class Stage<TInput, TOutput> : IDisposable
     {

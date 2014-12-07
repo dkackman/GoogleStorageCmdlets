@@ -1,14 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Collections.Generic;
-
-using GoogleStorage.ProducerConsumer;
-
-using Newtonsoft.Json;
 
 namespace GoogleStorage.Buckets
 {
@@ -31,12 +26,10 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var cancelToken = GetCancellationToken();
-                var t = GetBucketContents(cancelToken);
+                var api = CreateApiWrapper();
+                var t = api.GetBucketContents(Bucket);
                 var contents = t.Result;
 
-                var accessTask = GetAccessToken(cancelToken);
-                var access_token = accessTask.Result;
                 IEnumerable<dynamic> items = contents.items;
 
                 using (var downloadPipeline = new Stage<Tuple<dynamic, string>, Tuple<dynamic, string>>())
@@ -44,13 +37,13 @@ namespace GoogleStorage.Buckets
                     // this is the delgate that does the downloading
                     Func<Tuple<dynamic, string>, Tuple<dynamic, string>> func = (input) =>
                         {
-                            Task<Tuple<dynamic, string>> task = ExportObject(input, cancelToken, access_token);
+                            Task<Tuple<dynamic, string>> task = api.ExportObject(input, IncludeMetaData);
                             return task.Result;
                         };
 
                     // this kicks off a number of async tasks that will do the downloads
                     // as items are added to the Input queue
-                    downloadPipeline.Start(func, cancelToken);
+                    downloadPipeline.Start(func, api.CancellationToken);
 
                     bool yesToAll = false;
                     bool noToAll = false;
@@ -65,13 +58,13 @@ namespace GoogleStorage.Buckets
                                 var msg = string.Format("Do you want to overwrite the file {0}?", path);
                                 if (Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll))
                                 {
-                                    downloadPipeline.Input.Add(tuple, cancelToken);
+                                    downloadPipeline.Input.Add(tuple, api.CancellationToken);
                                 }
                             }
                         }
                         else
                         {
-                            downloadPipeline.Input.Add(tuple, cancelToken);
+                            downloadPipeline.Input.Add(tuple, api.CancellationToken);
                         }
                     }
 
@@ -85,7 +78,7 @@ namespace GoogleStorage.Buckets
                     // those tasks populate this blocking collection
                     // it will block until all of the tasks are complete 
                     // at which point we know the background threads are done and the enumeration will complete
-                    foreach (var item in downloadPipeline.Output.GetConsumingEnumerable(cancelToken))
+                    foreach (var item in downloadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))
                     {
                         WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
                     }
@@ -110,36 +103,6 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
-        }
-
-        private async Task<Tuple<dynamic, string>> ExportObject(Tuple<dynamic, string> item, CancellationToken cancelToken, string access_token)
-        {
-            var downloader = new FileDownloader(item.Item1.mediaLink, item.Item2, item.Item1.contentType, GoogleStorageCmdlet.UserAgent);
-
-            await downloader.Download(cancelToken, access_token);
-
-            if (IncludeMetaData)
-            {
-                SaveMetaData(item);
-            }
-
-            return item;
-        }
-
-        private static void SaveMetaData(Tuple<dynamic, string> item)
-        {
-            using (var writer = new StreamWriter(item.Item2 + ".metadata.json"))
-            {
-                string json = JsonConvert.SerializeObject(item.Item1);
-                writer.Write(json);
-            }
-        }
-
-        private async Task<dynamic> GetBucketContents(CancellationToken cancelToken)
-        {
-            dynamic google = CreateClient();
-
-            return await google.storage.v1.b(Bucket).o.get(cancelToken);
         }
     }
 }

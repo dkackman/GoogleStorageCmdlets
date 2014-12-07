@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
@@ -14,8 +13,9 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var endpoint = GetBucketEndPoint();
-                Task<dynamic> t = endpoint.get();
+                var api = CreateApiWrapper();
+                var t = api.GetBucket(Bucket);
+
                 WriteObject(t.Result != null);
             }
             catch (HaltCommandException)
@@ -37,13 +37,6 @@ namespace GoogleStorage.Buckets
                 WriteVerbose(e.Message);
                 WriteObject(false);
             }
-        }
-
-        private dynamic GetBucketEndPoint()
-        {
-            dynamic google = CreateClient();
-
-            return google.storage.v1.b(Bucket);
         }
     }
 }

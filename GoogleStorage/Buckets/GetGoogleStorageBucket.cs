@@ -20,10 +20,11 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var endpoint = GetBucketEndPoint();
+                var api = CreateApiWrapper();
+
                 if (ListContents)
                 {
-                    var t = GetBucketContents(endpoint);
+                    var t = api.GetBucketContents(Bucket);
                     var contents = t.Result;
                     bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
                     foreach (var item in contents.items)
@@ -41,7 +42,7 @@ namespace GoogleStorage.Buckets
                 }
                 else
                 {
-                    var t = GetBucketMetaData(endpoint);
+                    var t = api.GetBucket(Bucket);
                     dynamic result = t.Result;
                     WriteDynamicObject(result, DisplayProperty);
                 }
@@ -60,23 +61,6 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
-        }
-
-        private async Task<dynamic> GetBucketContents(dynamic endpoint)
-        {
-            return await endpoint.o.get(GetCancellationToken());
-        }
-
-        private dynamic GetBucketEndPoint()
-        {
-            dynamic google = CreateClient();
-
-            return google.storage.v1.b(Bucket);
-        }
-
-        private async Task<dynamic> GetBucketMetaData(dynamic endpoint)
-        {
-            return await endpoint.get(GetCancellationToken());
         }
     }
 }

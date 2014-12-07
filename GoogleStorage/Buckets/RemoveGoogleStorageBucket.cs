@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Dynamic;
-
-using DynamicRestProxy.PortableHttpClient;
 
 namespace GoogleStorage.Buckets
 {
@@ -26,7 +21,8 @@ namespace GoogleStorage.Buckets
                     var msg = string.Format("Do you want to remove the bucket {0}?", Bucket);
                     if (Force || ShouldContinue(msg, "Remove bucket?"))
                     {
-                        var t = RemoveBucket();
+                        var api = CreateApiWrapper();
+                        var t = api.RemoveBucket(Bucket);
                         dynamic result = t.Result;
                         WriteVerbose(string.Format("Bucket {0} removed", Bucket));
                     }
@@ -46,13 +42,6 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
-        }
-
-        private async Task<dynamic> RemoveBucket()
-        {
-            dynamic google = CreateClient();
-
-            return await google.storage.v1.b(Bucket).delete(GetCancellationToken());
         }
     }
 }

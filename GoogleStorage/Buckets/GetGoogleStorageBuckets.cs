@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
@@ -18,7 +17,11 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var t = GetBuckets();
+                var project = GetProjectName(Project);
+                Debug.Assert(!string.IsNullOrEmpty(project));
+
+                var api = CreateApiWrapper(project);
+                var t = api.GetBuckets();
                 dynamic result = t.Result;
 
                 bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
@@ -52,15 +55,6 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
-        }
-
-        private async Task<dynamic> GetBuckets()
-        {
-            var project = GetProjectName(Project);
-            Debug.Assert(!string.IsNullOrEmpty(project));
-
-            dynamic google = CreateClient();
-            return await google.storage.v1.b.get(GetCancellationToken(), project: project);
         }
     }
 }

@@ -17,23 +17,17 @@ namespace GoogleStorage
         [Parameter(Mandatory = false)]
         public SwitchParameter Persist { get; set; }
 
-        protected DynamicRestClient CreateClient()
+        protected GoogleStorageApi CreateApiWrapper()
         {
-            var defaults = new DynamicRestClientDefaults()
-            {
-                UserAgent = GoogleStorageCmdlet.UserAgent
-            };
+            return CreateApiWrapper("");
+        }
+        protected GoogleStorageApi CreateApiWrapper(string project)
+        {
+            var cancelToken = GetCancellationToken();
+            var t = GetAccessToken(cancelToken);
+            string access_token = t.Result;
 
-            if (NoAuth)
-            {
-                return new DynamicRestClient("https://www.googleapis.com/", defaults);
-            }
-
-            return new DynamicRestClient("https://www.googleapis.com/", defaults, async (request, cancelToken) =>
-            {
-                var accessToken = await GetAccessToken(cancelToken);
-                request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", accessToken);
-            });
+            return new GoogleStorageApi(project, GoogleStorageAuthenticatedCmdlet.UserAgent, access_token, cancelToken);
         }
 
         protected async Task<string> GetAccessToken(CancellationToken cancelToken)

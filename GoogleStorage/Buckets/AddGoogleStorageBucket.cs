@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Dynamic;
-
-using DynamicRestProxy.PortableHttpClient;
 
 namespace GoogleStorage.Buckets
 {
@@ -24,7 +20,9 @@ namespace GoogleStorage.Buckets
                 var project = GetProjectName(Project);
                 Debug.Assert(!string.IsNullOrEmpty(project));
 
-                var t = AddBucket(project);
+                var api = CreateApiWrapper(project);
+                var t = api.AddBucket(Bucket);
+
                 dynamic result = t.Result;
                 WriteVerbose(string.Format("Bucket {0} added to project {1}", Bucket, project));
             }
@@ -42,15 +40,6 @@ namespace GoogleStorage.Buckets
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
-        }
-
-        private async Task<dynamic> AddBucket(string project)
-        {
-            dynamic google = CreateClient();
-            dynamic args = new ExpandoObject();
-            args.name = Bucket;
-
-            return await google.storage.v1.b.post(GetCancellationToken(), args, project: new PostUrlParam(project));
         }
     }
 }
