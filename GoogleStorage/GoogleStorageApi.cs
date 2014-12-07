@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Dynamic;
 using System.IO;
 
@@ -68,7 +67,7 @@ namespace GoogleStorage
 
         public async Task<dynamic> ImportObject(FileInfo file, string name)
         {
-            using (var stream = new StreamInfo(file.OpenRead(), "image/png"))
+            using (var stream = new StreamInfo(file.OpenRead(), file.GetContentType()))
             {
                 return await _googleStorageUpload.b.unit_tests.o.post(stream, name: new PostUrlParam(name), uploadType: new PostUrlParam("media"));
             }

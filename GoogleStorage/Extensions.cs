@@ -4,11 +4,18 @@ using System.Runtime.InteropServices;
 using System.Management.Automation.Runspaces;
 using System.Linq;
 using System.Reflection;
+using System.IO;
+using System.Web;
 
 namespace GoogleStorage
 {
     static class Extensions
     {
+        public static string GetContentType(this FileInfo file)
+        {
+            return MimeMapping.GetMimeMapping(file.Name);
+        }
+
         /// <summary>
         /// http://stackoverflow.com/questions/781205/getting-a-url-with-an-url-encoded-slash
         /// object media links may have eced path tokens
