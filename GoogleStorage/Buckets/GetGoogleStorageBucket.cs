@@ -36,7 +36,7 @@ namespace GoogleStorage.Buckets
                         }
                         else
                         {
-                            WriteObject(item.id);
+                            WriteObject(item.name);
                         }
                     }
                 }
