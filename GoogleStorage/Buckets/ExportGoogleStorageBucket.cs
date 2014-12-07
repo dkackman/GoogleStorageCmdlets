@@ -46,10 +46,11 @@ namespace GoogleStorage.Buckets
                     // the downloads as items are added to the Input queue
                     downloadPipeline.Start(func, api.CancellationToken);
 
-                    bool yesToAll = false;
-                    bool noToAll = false;
                     if (ShouldProcess(Bucket, "export"))
                     {
+                        bool yesToAll = false;
+                        bool noToAll = false;
+
                         foreach (var item in items)
                         {
                             string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
