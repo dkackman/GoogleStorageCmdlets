@@ -53,18 +53,17 @@ namespace GoogleStorage.Buckets
                         foreach (var item in items)
                         {
                             string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
-                            var tuple = new Tuple<dynamic, string>(item, path);
+
+                            bool process = true;
                             if (File.Exists(path)) // if the file exists confirm the overwrite
                             {
                                 var msg = string.Format("Do you want to overwrite the file {0}?", path);
-                                if (Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll))
-                                {
-                                    downloadPipeline.Input.Add(tuple, api.CancellationToken);
-                                }
+                                process = Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
                             }
-                            else
+
+                            if (process)
                             {
-                                downloadPipeline.Input.Add(tuple, api.CancellationToken);
+                                downloadPipeline.Input.Add(new Tuple<dynamic, string>(item, path), api.CancellationToken);
                             }
                         }
                     }
