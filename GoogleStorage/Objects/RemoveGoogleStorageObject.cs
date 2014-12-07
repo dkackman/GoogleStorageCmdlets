@@ -27,7 +27,7 @@ namespace GoogleStorage.Objects
                     {
                         var api = CreateApiWrapper();
                         var t = api.RemoveObject(Bucket, ObjectName);
-                        t.Wait();
+                        t.Wait(api.CancellationToken);
                         WriteVerbose(string.Format("{0} removed", path));
                     }
                 }   

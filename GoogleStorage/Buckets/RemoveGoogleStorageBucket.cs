@@ -23,7 +23,7 @@ namespace GoogleStorage.Buckets
                     {
                         var api = CreateApiWrapper();
                         var t = api.RemoveBucket(Bucket);
-                        t.Wait();
+                        t.Wait(api.CancellationToken);
                         WriteVerbose(string.Format("Bucket {0} removed", Bucket));
                     }
                 }   

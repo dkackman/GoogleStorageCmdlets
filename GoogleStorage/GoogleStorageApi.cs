@@ -74,7 +74,7 @@ namespace GoogleStorage
         {
             using (var stream = new StreamInfo(file.OpenRead(), file.GetContentType()))
             {
-                return await _googleStorageUpload.b.unit_tests.o.post(stream, name: new PostUrlParam(name), uploadType: new PostUrlParam("media"));
+                return await _googleStorageUpload.b.unit_tests.o.post(CancellationToken, stream, name: new PostUrlParam(name), uploadType: new PostUrlParam("media"));
             }
         }
 
