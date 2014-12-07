@@ -135,18 +135,16 @@ namespace GoogleStorage
         {
             var defaults = new DynamicRestClientDefaults()
             {
-                UserAgent = UserAgent
+                UserAgent = UserAgent,
             };
 
-            if (string.IsNullOrEmpty(access_token))
+            if (!string.IsNullOrEmpty(access_token))
             {
-                return new DynamicRestClient("https://www.googleapis.com/", defaults);
+                defaults.AuthScheme = "OAuth";
+                defaults.AuthToken = access_token;
             }
 
-            return new DynamicRestClient("https://www.googleapis.com/", defaults, async (request, cancelToken) =>
-            {
-                request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", access_token);
-            });
+            return new DynamicRestClient("https://www.googleapis.com/", defaults);
         }
     }
 }
