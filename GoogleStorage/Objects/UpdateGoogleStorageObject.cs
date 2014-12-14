@@ -35,8 +35,8 @@ namespace GoogleStorage.Objects
                     {
                         var api = CreateApiWrapper();
                         var t = api.UpdateObjectMetaData(Bucket, ObjectName, PropertyName, PropertyValue);
-
                         dynamic result = t.Result;
+
                         WriteDynamicObject(result);
                         WriteVerbose(string.Format("Object {0}/{1} {2} property set to {3}", Bucket, ObjectName, PropertyName, PropertyValue));
                     }

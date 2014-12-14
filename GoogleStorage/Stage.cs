@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace GoogleStorage
 {
@@ -23,16 +24,20 @@ namespace GoogleStorage
             Errors = new ConcurrentBag<Tuple<TInput, Exception>>();
         }
 
-        public void Start(Func<TInput, TOutput> func, CancellationToken cancelToken)
+        public async Task Start(Func<TInput, Task<TOutput>> func, CancellationToken cancelToken)
         {
-            // this is the delegate that does the downloading
-            Action download = () =>
+            // func is the delegate that does the work, such as downloading
+            // the consumeInput async lambda spins over the input collection,
+            // calls the worker func for each item it gets, and waits for the input colleciton to
+            // be emptied and closed. This will run on multiple threads
+            Func<Task> consumeInput = async () =>
                 {
                     foreach (var item in Input.GetConsumingEnumerable(cancelToken))
                     {
                         try
                         {
-                            Output.Add(func(item));
+                            TOutput output = await func(item);
+                            Output.Add(output);
                         }
                         catch (AggregateException e)
                         {
@@ -48,13 +53,13 @@ namespace GoogleStorage
                     }
                 };
 
-            // these are the download threads - each download blocks while in progress but the others can work in parallel
-            Task.Run(() =>
+            // these are the worker threads 
+            await Task.Run(() =>
                 {
                     Task[] tasks = new Task[TaskCount];
                     for (int i = 0; i < tasks.Length; i++)
                     {
-                        tasks[i] = Task.Run(download, cancelToken);
+                        tasks[i] = Task.Run(consumeInput);
                     }
 
                     Task.WaitAll(tasks, cancelToken);

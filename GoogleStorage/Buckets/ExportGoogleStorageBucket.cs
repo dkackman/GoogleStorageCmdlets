@@ -35,10 +35,9 @@ namespace GoogleStorage.Buckets
                 using (var downloadPipeline = new Stage<Tuple<dynamic, string>, Tuple<dynamic, string>>())
                 {
                     // this is the delgate that does the downloading
-                    Func<Tuple<dynamic, string>, Tuple<dynamic, string>> func = (input) =>
+                    Func<Tuple<dynamic, string>, Task<Tuple<dynamic, string>>> func = async (input) =>
                         {
-                            Task task = api.ExportObject(input, IncludeMetaData);
-                            task.Wait(api.CancellationToken);
+                            await api.ExportObject(input, IncludeMetaData);
                             return input;
                         };
 

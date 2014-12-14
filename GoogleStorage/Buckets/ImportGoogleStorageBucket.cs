@@ -26,11 +26,11 @@ namespace GoogleStorage.Buckets
                 using (var uploadPipeline = new Stage<Tuple<FileInfo, string>, Tuple<FileInfo, dynamic>>())
                 {
                     // this is the delgate that does the downloading
-                    Func<Tuple<FileInfo, string>, Tuple<FileInfo, dynamic>> func = (input) =>
+                    Func<Tuple<FileInfo, string>, Task<Tuple<FileInfo, dynamic>>> func = async (input) =>
                     {
-                        Task<dynamic> task = api.ImportObject(input.Item1, input.Item2);
-                        task.Wait(api.CancellationToken);
-                        return new Tuple<FileInfo, dynamic>(input.Item1, task.Result);
+                        dynamic result = await api.ImportObject(input.Item1, input.Item2);
+                        
+                        return new Tuple<FileInfo, dynamic>(input.Item1, result);
                     };
 
                     // this kicks off a number of async tasks that will do the downloads

@@ -1,4 +1,5 @@
-﻿<#
+﻿
+<#
 This script will run on debug.
 It will load in a PowerShell command shell and import the module developed in the project. To end debug, exit this shell.
 #>
@@ -17,6 +18,7 @@ Write-Host
 $env:PSModulePath = (Resolve-Path .).Path + ";" + $env:PSModulePath
 Import-Module GoogleStorage 
 
+cd ..\..\
 
 #Grant-GoogleStorageAuth -ShowBrowser -Persist
 

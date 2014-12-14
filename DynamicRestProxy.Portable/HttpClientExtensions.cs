@@ -25,12 +25,13 @@ namespace DynamicRestProxy.PortableHttpClient
                 var converter = new ExpandoObjectConverter();
                 if (content.StartsWith("[")) // when the result is a list we need to tell JSonConvert
                 {
-                    return await Task.Factory.StartNew<dynamic>(() => JsonConvert.DeserializeObject<List<dynamic>>(content, converter), token);
+                    return await Task.Run<dynamic>(() => JsonConvert.DeserializeObject<List<dynamic>>(content, converter), token);
                 }
 
-                return await Task.Factory.StartNew<dynamic>(() => JsonConvert.DeserializeObject<ExpandoObject>(content, converter), token);
+                return await Task.Run<dynamic>(() => JsonConvert.DeserializeObject<ExpandoObject>(content, converter), token);
             }
-            return await Task.Factory.StartNew<dynamic>(() => { return null; }, token);
+
+            return null;
         }
     }
 }
