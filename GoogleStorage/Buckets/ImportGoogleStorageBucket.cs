@@ -29,7 +29,7 @@ namespace GoogleStorage.Buckets
                     Func<Tuple<FileInfo, string>, Task<Tuple<FileInfo, dynamic>>> func = async (input) =>
                     {
                         dynamic result = await api.ImportObject(input.Item1, input.Item2);
-                        
+
                         return new Tuple<FileInfo, dynamic>(input.Item1, result);
                     };
 
@@ -47,17 +47,16 @@ namespace GoogleStorage.Buckets
                         foreach (var file in files.GetFiles())
                         {
                             var name = file.Name;
+
+                            bool process = true;
+                            // check yesToAll so we don't check the remote file if the user has already indicated they don't care
                             if (!yesToAll && !Force && RemoteFileExists(api, name))
                             {
                                 var msg = string.Format("Do you want to overwrite the file {0}?", name);
-
-                                if (Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll))
-                                {
-                                    uploadPipeline.Input.Add(Tuple.Create(file, name), api.CancellationToken);
-                                    count++;
-                                }
+                                process = Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
                             }
-                            else
+
+                            if (process)
                             {
                                 uploadPipeline.Input.Add(Tuple.Create(file, name), api.CancellationToken);
                                 count++;
