@@ -87,6 +87,7 @@ namespace GoogleStorage
             // here poll google for success
             while (time < expiration)
             {
+                cancelToken.ThrowIfCancellationRequested();
                 Thread.Sleep((int)interval * 1000);
 
                 dynamic tokenResponse = await google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), code: confirmToken.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
