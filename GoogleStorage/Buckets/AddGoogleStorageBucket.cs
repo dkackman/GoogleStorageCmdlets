@@ -20,11 +20,11 @@ namespace GoogleStorage.Buckets
                 var project = GetProjectName(Project);
                 Debug.Assert(!string.IsNullOrEmpty(project));
 
-                var api = CreateApiWrapper(project);
-                var t = api.AddBucket(Bucket);
-
-                dynamic result = t.Result;
-                WriteVerbose(string.Format("Bucket {0} added to project {1}", Bucket, project));
+                using (var api = CreateApiWrapper(project))
+                {
+                    dynamic result = api.AddBucket(Bucket).WaitForResult(GetCancellationToken());
+                    WriteVerbose(string.Format("Bucket {0} added to project {1}", Bucket, project));
+                }
             }
             catch (HaltCommandException)
             {

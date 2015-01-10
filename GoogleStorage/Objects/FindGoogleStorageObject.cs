@@ -16,10 +16,11 @@ namespace GoogleStorage.Objects
         {
             try
             {
-                var api = CreateApiWrapper();
-                var t = api.FindObject(Bucket, ObjectName);
-
-                WriteObject(t.Result);
+                using (var api = CreateApiWrapper())
+                {
+                    bool exists = api.FindObject(Bucket, ObjectName).WaitForResult(GetCancellationToken());
+                    WriteObject(exists);
+                }
             }
             catch (HaltCommandException)
             {

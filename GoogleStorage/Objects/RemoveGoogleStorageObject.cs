@@ -25,12 +25,13 @@ namespace GoogleStorage.Objects
                     var msg = string.Format("Do you want to remove the object {0}?", path);
                     if (Force || ShouldContinue(msg, "Remove bucket?"))
                     {
-                        var api = CreateApiWrapper();
-                        var t = api.RemoveObject(Bucket, ObjectName);
-                        t.Wait(api.CancellationToken);
+                        using (var api = CreateApiWrapper())
+                        {
+                            api.RemoveObject(Bucket, ObjectName).Wait(GetCancellationToken());
+                        }
                         WriteVerbose(string.Format("{0} removed", path));
                     }
-                }   
+                }
             }
             catch (HaltCommandException)
             {

@@ -33,12 +33,13 @@ namespace GoogleStorage.Objects
                 {
                     if (Force || ShouldContinue(string.Format("Set object {0}/{1} {2} to {3}?", Bucket, ObjectName, PropertyName, PropertyValue), "Update Object?"))
                     {
-                        var api = CreateApiWrapper();
-                        var t = api.UpdateObjectMetaData(Bucket, ObjectName, PropertyName, PropertyValue);
-                        dynamic result = t.Result;
+                        using (var api = CreateApiWrapper())
+                        {
+                            var result = api.UpdateObjectMetaData(Bucket, ObjectName, PropertyName, PropertyValue).WaitForResult(GetCancellationToken());
 
-                        WriteDynamicObject(result);
-                        WriteVerbose(string.Format("Object {0}/{1} {2} property set to {3}", Bucket, ObjectName, PropertyName, PropertyValue));
+                            WriteDynamicObject(result);
+                            WriteVerbose(string.Format("Object {0}/{1} {2} property set to {3}", Bucket, ObjectName, PropertyName, PropertyValue));
+                        }
                     }
                 }          
             }

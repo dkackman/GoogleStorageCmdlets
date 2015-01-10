@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Diagnostics;
 
+using GoogleStorage;
+
 namespace GoogleStorage.Config
 {
     [Cmdlet(VerbsSecurity.Grant, "GoogleStorageAccess")]
@@ -22,8 +24,7 @@ namespace GoogleStorage.Config
                 dynamic config = GetConfig();
                 var cancelToken = GetCancellationToken();
 
-                var startTask = StartAuth(config, cancelToken);
-                var confirmToken = startTask.Result;
+                var confirmToken = StartAuth(config, cancelToken).WaitForResult(GetCancellationToken());
 
                 WriteWarning("This action requires authorization with Google Storage");
                 if (!ShowBrowser)
@@ -41,8 +42,7 @@ namespace GoogleStorage.Config
 
                 WriteVerbose("Waiting for authorization...");
 
-                var confirmTask = ConfirmAuth(confirmToken, config, cancelToken);
-                var access = confirmTask.Result;
+                var access = ConfirmAuth(confirmToken, config, cancelToken).WaitForResult(GetCancellationToken());
 
                 SetPersistedVariableValue("access", access, Persist);
                 WriteVerbose("Authorized");

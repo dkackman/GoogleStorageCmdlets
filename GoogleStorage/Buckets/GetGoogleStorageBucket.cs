@@ -20,31 +20,31 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var api = CreateApiWrapper();
-
-                if (ListContents)
+                using (var api = CreateApiWrapper())
                 {
-                    var t = api.GetBucketContents(Bucket);
-                    var contents = t.Result;
-                    bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
-                    foreach (var item in contents.items)
+
+                    if (ListContents)
                     {
-                        if (verbose)
+                        var contents = api.GetBucketContents(Bucket).WaitForResult(GetCancellationToken());
+                        bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
+                        foreach (var item in contents.items)
                         {
-                            WriteDynamicObject(item, DisplayProperty);
-                            WriteVerbose("");
-                        }
-                        else
-                        {
-                            WriteObject(item.name);
+                            if (verbose)
+                            {
+                                WriteDynamicObject(item, DisplayProperty);
+                                WriteVerbose("");
+                            }
+                            else
+                            {
+                                WriteObject(item.name);
+                            }
                         }
                     }
-                }
-                else
-                {
-                    var t = api.GetBucket(Bucket);
-                    dynamic result = t.Result;
-                    WriteDynamicObject(result, DisplayProperty);
+                    else
+                    {
+                        dynamic result = api.GetBucket(Bucket).WaitForResult(GetCancellationToken());
+                        WriteDynamicObject(result, DisplayProperty);
+                    }
                 }
             }
             catch (HaltCommandException)

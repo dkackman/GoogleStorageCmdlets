@@ -49,6 +49,7 @@ namespace GoogleStorage
                         {
                             Errors.Add(Tuple.Create(item, e));
                         }
+                        cancelToken.ThrowIfCancellationRequested();
                     }
                 };
 

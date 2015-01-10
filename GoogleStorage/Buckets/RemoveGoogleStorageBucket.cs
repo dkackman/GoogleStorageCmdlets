@@ -21,10 +21,12 @@ namespace GoogleStorage.Buckets
                     var msg = string.Format("Do you want to remove the bucket {0}?", Bucket);
                     if (Force || ShouldContinue(msg, "Remove bucket?"))
                     {
-                        var api = CreateApiWrapper();
-                        var t = api.RemoveBucket(Bucket);
-                        t.Wait(api.CancellationToken);
-                        WriteVerbose(string.Format("Bucket {0} removed", Bucket));
+                        using (var api = CreateApiWrapper())
+                        {
+                            var t = api.RemoveBucket(Bucket);
+                            t.Wait(api.CancellationToken);
+                            WriteVerbose(string.Format("Bucket {0} removed", Bucket));
+                        }
                     }
                 }   
             }

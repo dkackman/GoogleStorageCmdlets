@@ -26,27 +26,27 @@ namespace GoogleStorage.Objects
         {
             try
             {
-                var api = CreateApiWrapper();
-                var t = api.GetObject(Bucket, ObjectName);
-                var item = t.Result;
-
-                if (ShouldProcess(string.Format("{0}/{1}", Bucket, ObjectName), "export"))
+                using (var api = CreateApiWrapper())
                 {
-                    string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
+                    var item = api.GetObject(Bucket, ObjectName).WaitForResult(GetCancellationToken());                    
 
-                    bool process = true;
-                    if (File.Exists(path)) // if the file exists confirm the overwrite
+                    if (ShouldProcess(string.Format("{0}/{1}", Bucket, ObjectName), "export"))
                     {
-                        var msg = string.Format("Do you want to overwrite the file {0}?", path);
-                        process = Force || ShouldContinue(msg, "Overwrite file?");
-                    }
+                        string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
 
-                    if (process)
-                    {
-                        var task = api.ExportObject(new Tuple<dynamic, string>(item, path), IncludeMetaData);
-                        task.Wait(api.CancellationToken);
+                        bool process = true;
+                        if (File.Exists(path)) // if the file exists confirm the overwrite
+                        {
+                            var msg = string.Format("Do you want to overwrite the file {0}?", path);
+                            process = Force || ShouldContinue(msg, "Overwrite file?");
+                        }
 
-                        WriteVerbose(string.Format("Exported {0} to {1}", item.name, path));
+                        if (process)
+                        {
+                            api.ExportObject(new Tuple<dynamic, string>(item, path), IncludeMetaData).Wait(GetCancellationToken());                            
+
+                            WriteVerbose(string.Format("Exported {0} to {1}", item.name, path));
+                        }
                     }
                 }
             }

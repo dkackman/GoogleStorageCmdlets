@@ -19,18 +19,19 @@ namespace GoogleStorage.Objects
         {
             try
             {
-                var api = CreateApiWrapper();
-                var t = api.GetObject(Bucket, ObjectName);
-                var item = t.Result;
+                using (var api = CreateApiWrapper())
+                {
+                    var item = api.GetObject(Bucket, ObjectName).WaitForResult(GetCancellationToken());
 
-                bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
-                if (verbose)
-                {
-                    WriteDynamicObject(item, DisplayProperty);
-                }
-                else
-                {
-                    WriteObject(item.name);
+                    bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
+                    if (verbose)
+                    {
+                        WriteDynamicObject(item, DisplayProperty);
+                    }
+                    else
+                    {
+                        WriteObject(item.name);
+                    }
                 }
             }
             catch (HaltCommandException)

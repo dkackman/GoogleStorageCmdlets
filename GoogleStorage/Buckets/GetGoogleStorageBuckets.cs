@@ -20,24 +20,25 @@ namespace GoogleStorage.Buckets
                 var project = GetProjectName(Project);
                 Debug.Assert(!string.IsNullOrEmpty(project));
 
-                var api = CreateApiWrapper(project);
-                var t = api.GetBuckets();
-                dynamic result = t.Result;
-
-                bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
-                foreach (var item in result.items)
+                using (var api = CreateApiWrapper(project))
                 {
-                    if (verbose)
+                    dynamic result = api.GetBuckets().WaitForResult(GetCancellationToken());
+
+                    bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
+                    foreach (var item in result.items)
                     {
-                        WriteObject(item, true);
-                    }
-                    else if (!string.IsNullOrEmpty(DisplayProperty))
-                    {
-                        WriteDynamicObject(item, DisplayProperty);
-                    }
-                    else
-                    {
-                        WriteObject(item.id);
+                        if (verbose)
+                        {
+                            WriteObject(item, true);
+                        }
+                        else if (!string.IsNullOrEmpty(DisplayProperty))
+                        {
+                            WriteDynamicObject(item, DisplayProperty);
+                        }
+                        else
+                        {
+                            WriteObject(item.id);
+                        }
                     }
                 }
             }

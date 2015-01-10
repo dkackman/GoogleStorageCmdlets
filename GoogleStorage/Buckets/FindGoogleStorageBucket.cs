@@ -13,10 +13,12 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var api = CreateApiWrapper();
-                var t = api.FindBucket(Bucket);
+                using (var api = CreateApiWrapper())
+                {
+                    var exists = api.FindBucket(Bucket).WaitForResult(GetCancellationToken());
 
-                WriteObject(t.Result);
+                    WriteObject(exists);
+                }
             }
             catch (HaltCommandException)
             {

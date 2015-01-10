@@ -8,6 +8,8 @@ namespace GoogleStorage
 {
     public abstract class GoogleStorageAuthenticatedCmdlet : GoogleStorageCmdlet
     {
+        private const string UserAgent = "GoogleStorageCmdlets/0.1";
+
         [Parameter(Mandatory = false)]
         public SwitchParameter NoAuth { get; set; }
 
@@ -22,11 +24,9 @@ namespace GoogleStorage
         protected GoogleStorageApi CreateApiWrapper(string project)
         {
             var cancelToken = GetCancellationToken();
-            var t = GetAccessToken(cancelToken);
-            t.Wait(cancelToken);
-            string access_token = t.Result;
+            string access_token = GetAccessToken(cancelToken).WaitForResult(cancelToken);
 
-            return new GoogleStorageApi(project, GoogleStorageAuthenticatedCmdlet.UserAgent, access_token, cancelToken);
+            return new GoogleStorageApi(project, UserAgent, access_token, cancelToken);
         }
 
         protected async Task<string> GetAccessToken(CancellationToken cancelToken)

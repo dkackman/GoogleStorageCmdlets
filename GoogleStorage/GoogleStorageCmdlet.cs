@@ -9,8 +9,6 @@ namespace GoogleStorage
 {
     public abstract class GoogleStorageCmdlet : PSCmdlet
     {
-        public const string UserAgent = "GoogleStorageCmdlets/0.1";
-
         private CancellationTokenSource _cancelTokenSource;
 
         protected void WriteDynamicObject(dynamic o, string propertyName = null)

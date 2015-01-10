@@ -6,11 +6,19 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Web;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GoogleStorage
 {
     static class Extensions
     {
+        public static T WaitForResult<T>(this Task<T> task, CancellationToken cancelToken)
+        {
+            task.Wait(cancelToken);
+            return task.Result;
+        }
+
         public static string GetContentType(this FileInfo file)
         {
             return MimeMapping.GetMimeMapping(file.Name);
