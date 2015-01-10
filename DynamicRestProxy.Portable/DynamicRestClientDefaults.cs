@@ -3,7 +3,7 @@
 namespace DynamicRestProxy.PortableHttpClient
 {
     /// <summary>
-    /// Default values that will be added all all requests
+    /// Default values that will be added all requests
     /// </summary>
     public class DynamicRestClientDefaults
     {
@@ -36,6 +36,9 @@ namespace DynamicRestProxy.PortableHttpClient
         /// </summary>
         public string AuthScheme { get; set; }
 
+        /// <summary>
+        /// User agent string in the format product/version
+        /// </summary>
         public string UserAgent { get; set; }
     }
 }

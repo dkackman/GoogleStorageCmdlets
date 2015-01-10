@@ -8,22 +8,21 @@ using System.Net.Http.Headers;
 
 namespace GoogleStorage
 {
-    class FileDownloader
+    sealed class FileDownloader : IDisposable
     {
-        public string Source { get; private set; }
+        private readonly HttpClient _client;
 
-        public string Destination { get; private set; }
-
-        public string ContentType { get; private set; }
-
-        public string UserAgent { get; private set; }
-
-        public FileDownloader(string source, string destination, string contentType, string userAgent)
+        public FileDownloader(string userAgent, string access_token)
         {
-            Source = source;
-            Destination = destination;
-            ContentType = FormatContentType(contentType);
-            UserAgent = userAgent;
+            _client = CreateHttpClient(userAgent, access_token);
+        }
+
+        public void Dispose()
+        {
+            if (_client != null)
+            {
+                _client.Dispose();
+            }
         }
 
         private static string FormatContentType(string contentType)
@@ -42,56 +41,57 @@ namespace GoogleStorage
             return contentType;
         }
 
-        public async Task Download(CancellationToken cancelToken, string access_token)
+        private static HttpClient CreateHttpClient(string agent, string access_token)
         {
-            // build out the folder strucutre that might be embedded in the item name
-            var directory = Path.GetDirectoryName(Destination);
-            Directory.CreateDirectory(directory);
-
-            // the item is a folder - nothing to download
-            if (Destination.TrimEnd('\\') == directory)
-            {
-                return;
-            }
-
-            var uri = new Uri(Source);
-            uri.ForceCanonicalPathAndQuery();
-
             var handler = new HttpClientHandler();
             if (handler.SupportsAutomaticDecompression)
             {
                 handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             }
 
-            using (var client = new HttpClient(handler, true))
+            var client = new HttpClient(handler, true);
+
+            if (handler.SupportsTransferEncodingChunked())
             {
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType));
+                client.DefaultRequestHeaders.TransferEncodingChunked = true;
+            }
 
-                ProductInfoHeaderValue productHeader = null;
-                if (!string.IsNullOrEmpty(UserAgent) && ProductInfoHeaderValue.TryParse(UserAgent, out productHeader))
-                {
-                    client.DefaultRequestHeaders.UserAgent.Clear();
-                    client.DefaultRequestHeaders.UserAgent.Add(productHeader);
-                }
+            ProductInfoHeaderValue productHeader = null;
+            if (!string.IsNullOrEmpty(agent) && ProductInfoHeaderValue.TryParse(agent, out productHeader))
+            {
+                client.DefaultRequestHeaders.UserAgent.Clear();
+                client.DefaultRequestHeaders.UserAgent.Add(productHeader);
+            }
 
-                if (handler.SupportsTransferEncodingChunked())
-                {
-                    client.DefaultRequestHeaders.TransferEncodingChunked = true;
-                }
+            if (!string.IsNullOrEmpty(access_token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", access_token);
+            }
 
-                if (!string.IsNullOrEmpty(access_token))
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", access_token);
-                }
+            return client;
+        }
 
-                var response = await client.GetAsync(uri, cancelToken);
-                response.EnsureSuccessStatusCode();
+        public async Task Download(string source, string destination, string contentType, CancellationToken cancelToken)
+        {
+            // build out the folder strucutre that might be embedded in the item name
+            var directory = Path.GetDirectoryName(destination);
+            Directory.CreateDirectory(directory);
 
-                using (var stream = new FileStream(Destination, FileMode.Create, FileAccess.Write, FileShare.None))
-                {
-                    await response.Content.CopyToAsync(stream);
-                }
+            // the item is a folder - nothing to download
+            if (destination.TrimEnd('\\') == directory)
+            {
+                return;
+            }
+
+            var uri = new Uri(source);
+            uri.ForceCanonicalPathAndQuery();
+
+            var response = await _client.GetAsync(uri, cancelToken);
+            response.EnsureSuccessStatusCode();
+
+            using (var stream = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await response.Content.CopyToAsync(stream);
             }
         }
     }

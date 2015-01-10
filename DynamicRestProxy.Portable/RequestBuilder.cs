@@ -4,34 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Threading;
 
 namespace DynamicRestProxy.PortableHttpClient
 {
     class RequestBuilder
     {
-        private RestProxy _proxy;
-        private DynamicRestClientDefaults _defaults;
+        private readonly RestProxy _proxy;
 
-        public RequestBuilder(RestProxy proxy, DynamicRestClientDefaults defaults)
+        private static readonly IDictionary<string, HttpMethod> _methods = BinderExtensions._verbs.ToDictionary(verb => verb, verb => new HttpMethod(verb.ToUpperInvariant()));
+
+        public RequestBuilder(RestProxy proxy)
         {
             Debug.Assert(proxy != null);
             _proxy = proxy;
-            _defaults = defaults;
         }
 
-        public HttpRequestMessage CreateRequest(string verb, IEnumerable<object> unnamedArgs, IDictionary<string, object> namedArgs)
+        public HttpRequestMessage CreateRequest(string verb, IEnumerable<object> unnamedArgs, IEnumerable<KeyValuePair<string, object>> namedArgs)
         {
-            var method = GetMethod(verb);
+            // the way the base class and this class's static contructor use BinderExtensions._verbs should prevent an unkown verb from reaching here
+            Debug.Assert(_methods.ContainsKey(verb), "unrecognized verb. check the BinderExtensions _verbs array");
 
-            var allNamedArgs = namedArgs.Concat(_defaults.DefaultParameters);
-
-            var request = new HttpRequestMessage();
-            request.Method = method;
-            request.RequestUri = MakeUri(method, allNamedArgs);
+            var method = _methods[verb];
+            var request = new HttpRequestMessage()
+            {
+                Method = method,
+                RequestUri = MakeUri(method, namedArgs)
+            };
 
             // filter out a cancellationtoken if passed
-            var content = CreateContent(method, unnamedArgs.Where(arg => !(arg is CancellationToken)), allNamedArgs);
+            var content = CreateContent(method, unnamedArgs, namedArgs);
             if (content != null)
             {
                 request.Content = content;
@@ -77,32 +78,6 @@ namespace DynamicRestProxy.PortableHttpClient
             }
 
             return null;
-        }
-
-        private static HttpMethod GetMethod(string verb)
-        {
-            if (verb == "get")
-            {
-                return HttpMethod.Get;
-            }
-            if (verb == "post")
-            {
-                return HttpMethod.Post;
-            }
-            if (verb == "delete")
-            {
-                return HttpMethod.Delete;
-            }
-            if (verb == "put")
-            {
-                return HttpMethod.Put;
-            }
-            if (verb == "patch")
-            {
-                return new HttpMethod("PATCH");
-            }
-
-            throw new InvalidOperationException("Unknown http verb:" + verb);
         }
     }
 }

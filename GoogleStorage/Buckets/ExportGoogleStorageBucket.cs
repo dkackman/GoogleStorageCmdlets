@@ -26,66 +26,68 @@ namespace GoogleStorage.Buckets
         {
             try
             {
-                var api = CreateApiWrapper();
-                var t = api.GetBucketContents(Bucket);
-                var contents = t.Result;
-
-                IEnumerable<dynamic> items = contents.items;
-
-                using (var downloadPipeline = new Stage<Tuple<dynamic, string>, Tuple<dynamic, string>>())
+                using (var api = CreateApiWrapper())
                 {
-                    // this is the delgate that does the downloading
-                    Func<Tuple<dynamic, string>, Task<Tuple<dynamic, string>>> func = async (input) =>
-                        {
-                            await api.ExportObject(input, IncludeMetaData);
-                            return input;
-                        };
+                    var t = api.GetBucketContents(Bucket);
+                    var contents = t.Result;
 
-                    // this kicks off a number of async tasks that will do 
-                    // the downloads as items are added to the Input queue
-                    downloadPipeline.Start(func, api.CancellationToken);
+                    IEnumerable<dynamic> items = contents.items;
 
-                    if (ShouldProcess(Bucket, "export"))
+                    using (var downloadPipeline = new Stage<Tuple<dynamic, string>, Tuple<dynamic, string>>())
                     {
-                        bool yesToAll = false;
-                        bool noToAll = false;
+                        // this is the delgate that does the downloading
+                        Func<Tuple<dynamic, string>, Task<Tuple<dynamic, string>>> func = async (input) =>
+                            {
+                                await api.ExportObject(input, IncludeMetaData);
+                                return input;
+                            };
 
-                        foreach (var item in items)
+                        // this kicks off a number of async tasks that will do 
+                        // the downloads as items are added to the Input queue
+                        downloadPipeline.Start(func, api.CancellationToken);
+
+                        if (ShouldProcess(Bucket, "export"))
                         {
-                            string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
+                            bool yesToAll = false;
+                            bool noToAll = false;
 
-                            bool process = true;
-                            if (File.Exists(path)) // if the file exists confirm the overwrite
+                            foreach (var item in items)
                             {
-                                var msg = string.Format("Do you want to overwrite the file {0}?", path);
-                                process = Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
-                            }
+                                string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
 
-                            if (process)
-                            {
-                                downloadPipeline.Input.Add(new Tuple<dynamic, string>(item, path), api.CancellationToken);
+                                bool process = true;
+                                if (File.Exists(path)) // if the file exists confirm the overwrite
+                                {
+                                    var msg = string.Format("Do you want to overwrite the file {0}?", path);
+                                    process = Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
+                                }
+
+                                if (process)
+                                {
+                                    downloadPipeline.Input.Add(new Tuple<dynamic, string>(item, path), api.CancellationToken);
+                                }
                             }
                         }
-                    }
 
-                    // all of the items are enumerated and queued for download
-                    // let the pipeline stage know that it can exit that enumeration when empty
-                    downloadPipeline.Input.CompleteAdding();
+                        // all of the items are enumerated and queued for download
+                        // let the pipeline stage know that it can exit that enumeration when empty
+                        downloadPipeline.Input.CompleteAdding();
 
-                    int count = items.Count();
-                    int i = 0;
+                        int count = items.Count();
+                        int i = 0;
 
-                    // the tasks above populate this blocking collection
-                    // it will block until all of the tasks are complete 
-                    // at which point we know the background threads are done and the enumeration will complete
-                    foreach (var item in downloadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))
-                    {
-                        WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
-                    }
+                        // the tasks above populate this blocking collection
+                        // it will block until all of the tasks are complete 
+                        // at which point we know the background threads are done and the enumeration will complete
+                        foreach (var item in downloadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))
+                        {
+                            WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
+                        }
 
-                    foreach (var tuple in downloadPipeline.Errors)
-                    {
-                        WriteError(new ErrorRecord(tuple.Item2, tuple.Item2.Message, ErrorCategory.ReadError, tuple.Item1.Item1));
+                        foreach (var tuple in downloadPipeline.Errors)
+                        {
+                            WriteError(new ErrorRecord(tuple.Item2, tuple.Item2.Message, ErrorCategory.ReadError, tuple.Item1.Item1));
+                        }
                     }
                 }
             }

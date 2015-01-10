@@ -12,31 +12,41 @@ using DynamicRestProxy.PortableHttpClient;
 
 namespace GoogleStorage
 {
-    public class GoogleStorageApi
+    public sealed class GoogleStorageApi : IDisposable
     {
         public const string AuthScope = "https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/devstorage.read_write";
 
         public string Project { get; private set; }
-
-        public string UserAgent { get; private set; }
-
-        public string access_token { get; private set; }
 
         public CancellationToken CancellationToken { get; private set; }
 
         private readonly dynamic _googleStorage;
         private readonly dynamic _googleStorageUpload;
 
+        private readonly FileDownloader _downloader;
+
         public GoogleStorageApi(string project, string agent, string token, CancellationToken cancelToken)
         {
             Project = project;
-            UserAgent = agent;
-            access_token = token;
+            _downloader = new FileDownloader(agent, token);
             CancellationToken = cancelToken;
 
-            dynamic client = CreateClient();
+            dynamic client = CreateClient(agent, token);
             _googleStorage = client.storage.v1;
             _googleStorageUpload = client.upload.storage.v1;
+        }
+
+        public void Dispose()
+        {
+            if (_downloader != null)
+            {
+                _downloader.Dispose();
+            }
+
+            if (_googleStorage != null)
+            {
+                ((IDisposable)_googleStorage).Dispose();
+            }
         }
 
         public async Task<bool> FindObject(string bucket, string objectName)
@@ -80,9 +90,7 @@ namespace GoogleStorage
 
         public async Task ExportObject(Tuple<dynamic, string> item, bool includeMetaData)
         {
-            var downloader = new FileDownloader(item.Item1.mediaLink, item.Item2, item.Item1.contentType, UserAgent);
-
-            await downloader.Download(CancellationToken, access_token);
+            await _downloader.Download(item.Item1.mediaLink, item.Item2, item.Item1.contentType, CancellationToken);
 
             if (includeMetaData)
             {
@@ -135,11 +143,11 @@ namespace GoogleStorage
             return await _googleStorage.b.post(CancellationToken, args, project: new PostUrlParam(Project));
         }
 
-        private dynamic CreateClient()
+        private static dynamic CreateClient(string agent, string access_token)
         {
             var defaults = new DynamicRestClientDefaults()
             {
-                UserAgent = UserAgent,
+                UserAgent = agent,
             };
 
             if (!string.IsNullOrEmpty(access_token))

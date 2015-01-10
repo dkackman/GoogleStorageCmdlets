@@ -1,9 +1,11 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
+
+using Newtonsoft.Json;
 
 namespace DynamicRestProxy.PortableHttpClient
 {
@@ -12,7 +14,7 @@ namespace DynamicRestProxy.PortableHttpClient
     /// </summary>
     public class HttpClientProxy : RestProxy
     {
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         /// <summary>
         /// ctor
@@ -26,8 +28,6 @@ namespace DynamicRestProxy.PortableHttpClient
         internal HttpClientProxy(HttpClient client, RestProxy parent, string name)
             : base(parent, name)
         {
-            Debug.Assert(client != null);
-
             _client = client;
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -37,11 +37,11 @@ namespace DynamicRestProxy.PortableHttpClient
         }
 
         /// <summary>
-        /// <see cref="DynamicRestProxy.RestProxy.BaseUrl"/>
+        /// <see cref="DynamicRestProxy.RestProxy.BaseUri"/>
         /// </summary>
-        protected override string BaseUrl
+        protected override Uri BaseUri
         {
-            get { return _client.BaseAddress.ToString(); }
+            get { return _client.BaseAddress; }
         }
 
         /// <summary>
@@ -53,17 +53,18 @@ namespace DynamicRestProxy.PortableHttpClient
         }
 
         /// <summary>
-        /// <see cref="DynamicRestProxy.RestProxy.CreateVerbAsyncTask(string, IEnumerable{object}, IDictionary{string, object})"/>
+        /// <see cref="DynamicRestProxy.RestProxy.CreateVerbAsyncTask(string, IEnumerable{object}, IDictionary{string, object}, CancellationToken, JsonSerializerSettings)"/>
         /// </summary>
-        protected async override Task<dynamic> CreateVerbAsyncTask(string verb, IEnumerable<object> unnamedArgs, IDictionary<string, object> namedArgs)
+        protected async override Task<T> CreateVerbAsyncTask<T>(string verb, IEnumerable<object> unnamedArgs, IEnumerable<KeyValuePair<string, object>> namedArgs, CancellationToken cancelToken, JsonSerializerSettings serializationSettings)
         {
-            var builder = new RequestBuilder(this, new DynamicRestClientDefaults());
+            var builder = new RequestBuilder(this);
+
             using (var request = builder.CreateRequest(verb, unnamedArgs, namedArgs))
-            using (var response = await _client.SendAsync(request))
+            using (var response = await _client.SendAsync(request, cancelToken))
             {
                 response.EnsureSuccessStatusCode();
 
-                return await response.Deserialize(CancellationToken.None);
+                return await response.Deserialize<T>(serializationSettings);
             }
         }
     }

@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 
 namespace GoogleStorage
 {
@@ -64,6 +63,7 @@ namespace GoogleStorage
 
                     Task.WaitAll(tasks, cancelToken);
                     Output.CompleteAdding(); // this signals the calling thread that all the work is done
+                                             // because it will stop trying to iterate on the blocking enuemration
                 }, cancelToken);
         }
 

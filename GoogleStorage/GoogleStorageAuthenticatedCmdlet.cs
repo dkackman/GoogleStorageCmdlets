@@ -18,10 +18,12 @@ namespace GoogleStorage
         {
             return CreateApiWrapper("");
         }
+
         protected GoogleStorageApi CreateApiWrapper(string project)
         {
             var cancelToken = GetCancellationToken();
             var t = GetAccessToken(cancelToken);
+            t.Wait(cancelToken);
             string access_token = t.Result;
 
             return new GoogleStorageApi(project, GoogleStorageAuthenticatedCmdlet.UserAgent, access_token, cancelToken);

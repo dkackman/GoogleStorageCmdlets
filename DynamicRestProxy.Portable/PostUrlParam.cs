@@ -8,7 +8,7 @@ namespace DynamicRestProxy.PortableHttpClient
     public sealed class PostUrlParam
     {
         /// <summary>
-        /// The paramter's value
+        /// The parameter's value
         /// </summary>
         public object Value { get; private set; }
 
@@ -33,7 +33,7 @@ namespace DynamicRestProxy.PortableHttpClient
         /// <summary>
         /// <see cref="System.Object.GetHashCode"/>
         /// </summary>
-        /// <returns>the hascode of Value</returns>
+        /// <returns>the hashcode of Value</returns>
         public override int GetHashCode()
         {
             return Value != null ? Value.GetHashCode() : 0;
@@ -46,11 +46,21 @@ namespace DynamicRestProxy.PortableHttpClient
         /// <returns></returns>
         public override bool Equals(object obj)
         {
+            PostUrlParam p = obj as PostUrlParam;
+
+            // if obj is a PostUrlParam, compare values
+            if (p != null)
+            {
+                return p.Value == Value;
+            }
+
+            // compare everything else to Value
             if (Value != null)
             {
                 return Value.Equals(obj);
             }
 
+            // Value is null so we are equal if obj is too
             return object.ReferenceEquals(obj, null);
         }
     }

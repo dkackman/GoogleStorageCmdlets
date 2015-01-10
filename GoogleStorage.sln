@@ -12,9 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{617777
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicRestProxy.PortableHttpClient", "DynamicRestProxy.Portable\DynamicRestProxy.PortableHttpClient.csproj", "{11B51B4D-D60E-42E0-81D8-C9BCC08063AD}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{6EC5C448-F26A-4221-8E80-1989F115824C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicRestProxy.PortableHttpClient", "DynamicRestProxy.Portable\DynamicRestProxy.PortableHttpClient.csproj", "{11B51B4D-D60E-42E0-81D8-C9BCC08063AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
