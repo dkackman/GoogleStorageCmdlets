@@ -38,7 +38,8 @@ namespace GoogleStorage.Config
             config.ClientSecret = ClientSecret;
             config.Project = Project;
 
-            this.SetPersistedVariableValue("config", config, Persist);
+            SetPersistedVariableValue("config", config, Persist);
+            WriteVerbose("Google Storage configuration set.");
         }
     }
 }

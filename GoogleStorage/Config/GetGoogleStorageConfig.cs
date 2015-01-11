@@ -16,6 +16,10 @@ namespace GoogleStorage.Config
                 {
                     WriteObject(config);
                 }
+                else
+                {
+                    WriteVerbose("Configuration not set. Call Set-GoogleStorageConfig");
+                }
             }
             catch (Exception e)
             {

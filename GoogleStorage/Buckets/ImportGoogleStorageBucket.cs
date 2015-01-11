@@ -53,7 +53,7 @@ namespace GoogleStorage.Buckets
                 using(var api = CreateApiWrapper())
                 using (var uploadPipeline = new Stage<Tuple<FileInfo, string>, Tuple<FileInfo, dynamic>>())
                 {
-                    // this is the delgate that does the downloading
+                    // this is the delgate that does the uploading
                     Func<Tuple<FileInfo, string>, Task<Tuple<FileInfo, dynamic>>> func = async (input) =>
                     {
                         dynamic result = await api.ImportObject(input.Item1, input.Item2);
@@ -61,7 +61,7 @@ namespace GoogleStorage.Buckets
                         return new Tuple<FileInfo, dynamic>(input.Item1, result);
                     };
 
-                    // this kicks off a number of async tasks that will do the downloads
+                    // this kicks off a number of async tasks that will do the uploads
                     // as items are added to the Input queue
                     uploadPipeline.Start(func, api.CancellationToken);
 
@@ -97,9 +97,9 @@ namespace GoogleStorage.Buckets
                     // let the pipeline stage know that it can exit that enumeration when empty
                     uploadPipeline.Input.CompleteAdding();
 
-                    //// those tasks populate this blocking collection
-                    //// it will block until all of the tasks are complete 
-                    //// at which point we know the background threads are done and the enumeration will complete
+                    // those tasks populate this blocking collection
+                    // it will block until all of the tasks are complete 
+                    // at which point we know the background threads are done and the enumeration will complete
                     int i = 0;
                     foreach (var item in uploadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))
                     {

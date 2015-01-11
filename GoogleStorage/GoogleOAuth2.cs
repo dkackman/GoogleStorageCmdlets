@@ -28,17 +28,15 @@ namespace GoogleStorage
             _scope = scope;
         }
 
-        public async Task<dynamic> StartAuthentication(dynamic config)
+        public async Task<dynamic> StartAuthentication(string clientId)
         {
-            return await StartAuthentication(config, CancellationToken.None);
+            return await StartAuthentication(clientId, CancellationToken.None);
         }
 
-        public async Task<dynamic> StartAuthentication(dynamic config, CancellationToken cancelToken)
+        public async Task<dynamic> StartAuthentication(string clientId, CancellationToken cancelToken)
         {
             dynamic google = new DynamicRestClient("https://accounts.google.com/o/oauth2/");
-            var response = await google.device.code.post(cancelToken, client_id: config.ClientId, scope: _scope);
-
-            return response;
+            return await google.device.code.post(cancelToken, client_id: clientId, scope: _scope);
         }
 
         public async Task<dynamic> RefreshAccessToken(dynamic access, dynamic config, CancellationToken cancelToken)
@@ -55,17 +53,6 @@ namespace GoogleStorage
             return response;
         }
 
-        private static void SecureAccessToken(dynamic access)
-        {
-            string token = access.access_token;
-
-            SecureString secure = new SecureString();
-            Array.ForEach(token.ToArray(), secure.AppendChar);
-            secure.MakeReadOnly();
-
-            access.access_token = secure;
-        }
-
         /// <summary>
         /// This authenticates against user and requires user interaction to authorize the unit test to access apis
         /// This will do the auth, put the auth code on the clipboard and then open a browser with the app auth permission page
@@ -74,10 +61,8 @@ namespace GoogleStorage
         /// This should only need to be done once because the access token will be stored and refreshed for future test runs
         /// </summary>
         /// <returns></returns>
-        public async Task<dynamic> WaitForConfirmation(dynamic confirmToken, dynamic config, CancellationToken cancelToken)
+        public async Task<dynamic> WaitForConfirmation(dynamic confirmToken, string clientId, SecureString clientSecret, CancellationToken cancelToken)
         {
-            SecureString clientSecret = config.ClientSecret;
-
             long expiration = confirmToken.expires_in;
             long interval = confirmToken.interval;
             long time = interval;
@@ -90,7 +75,7 @@ namespace GoogleStorage
                 cancelToken.ThrowIfCancellationRequested();
                 Thread.Sleep((int)interval * 1000);
 
-                dynamic tokenResponse = await google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), code: confirmToken.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
+                dynamic tokenResponse = await google.token.post(cancelToken, client_id: clientId, client_secret: clientSecret.ToUnsecureString(), code: confirmToken.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
                 try
                 {
                     if (tokenResponse.access_token != null)
@@ -108,6 +93,17 @@ namespace GoogleStorage
             }
 
             throw new OperationCanceledException("Authorization from user timed out");
+        }
+
+        private static void SecureAccessToken(dynamic access)
+        {
+            string token = access.access_token;
+
+            SecureString secure = new SecureString();
+            Array.ForEach(token.ToArray(), secure.AppendChar);
+            secure.MakeReadOnly();
+
+            access.access_token = secure;
         }
     }
 }

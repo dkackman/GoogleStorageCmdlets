@@ -11,6 +11,7 @@ namespace GoogleStorage.Config
             try
             {
                 ClearPersistedVariableValue("config");
+                WriteVerbose("Configuration cleared");
             }
             catch (Exception e)
             {

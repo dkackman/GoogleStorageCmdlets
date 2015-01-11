@@ -29,7 +29,8 @@ namespace GoogleStorage.Config
                 dynamic config = GetConfig();
                 var cancelToken = GetCancellationToken();
 
-                var confirmToken = StartAuth(config, cancelToken).WaitForResult(GetCancellationToken());
+                var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
+                var confirmToken = oauth.StartAuthentication(config.ClientId, cancelToken).WaitForResult(cancelToken);
 
                 WriteWarning("This action requires authorization with Google Storage");
                 if (!ShowBrowser)
@@ -39,15 +40,15 @@ namespace GoogleStorage.Config
                 }
                 else
                 {
+                    WriteVerbose("Opening web browser at the verifcation url.");
                     Process.Start((string)confirmToken.verification_url);
                 }
 
-                WriteVerbose("Enter this code in the authorization web page to grant access to Google Storage to the Google Storage Cmdlets");
+                WriteVerbose("Enter this code in the authorization web page to grant access of Google Storage to the Google Storage Cmdlets");
                 WriteObject(confirmToken.user_code);
 
                 WriteVerbose("Waiting for authorization...");
-
-                var access = ConfirmAuth(confirmToken, config, cancelToken).WaitForResult(GetCancellationToken());
+                var access = oauth.WaitForConfirmation(confirmToken, config.ClientId, config.ClientSecret, cancelToken).WaitForResult(cancelToken);                
 
                 SetPersistedVariableValue("access", access, Persist);
                 WriteVerbose("Authorized");
@@ -66,18 +67,6 @@ namespace GoogleStorage.Config
             {
                 WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
             }
-        }
-
-        private static async Task<dynamic> ConfirmAuth(dynamic response, dynamic config, CancellationToken cancelToken)
-        {
-            var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
-            return await oauth.WaitForConfirmation(response, config, cancelToken);
-        }
-
-        private static async Task<dynamic> StartAuth(dynamic config, CancellationToken cancelToken)
-        {
-            var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
-            return await oauth.StartAuthentication(config, cancelToken);
         }
     }
 }

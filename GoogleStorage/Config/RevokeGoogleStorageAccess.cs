@@ -8,6 +8,7 @@ namespace GoogleStorage.Config
         protected override void ProcessRecord()
         {
             ClearPersistedVariableValue("access");
+            WriteVerbose("Google Storage authorization revoked");
         }
     }
 }
