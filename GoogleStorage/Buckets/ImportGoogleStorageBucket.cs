@@ -8,14 +8,43 @@ namespace GoogleStorage.Buckets
     [Cmdlet(VerbsData.Import, "GoogleStorageBucket", SupportsShouldProcess = true)]
     public class ImportGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// Full path to the folder where objects to be imported exist.
+        /// All objects in this folder will be included
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Source { get; set; }
 
+        /// <summary>
+        /// The id of the bucket into which objects will be imported
+        /// </summary>
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// Semi-colon separated list of file masks of files to include while importing
+        /// Defaults to *.*
+        /// </summary>
+        [Parameter(Mandatory = false, Position = 2, ValueFromPipelineByPropertyName = true)]
+        public string FileMasks { get; set; }
+
+        /// <summary>
+        /// Flag indicating wwhether to overwirte remote files without promting if they already exist
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
+
+        /// <summary>
+        /// Flag indicating whether to recurse sub folders and their contents under Source
+        /// while importing
+        /// </summary>
+        [Parameter(Mandatory = false)]
+        public SwitchParameter Recurse { get; set; }
+
+        public ImportGoogleStorageBucket()
+        {
+            FileMasks = "*.*";
+        }
 
         protected override void ProcessRecord()
         {
@@ -40,7 +69,7 @@ namespace GoogleStorage.Buckets
                     bool noToAll = false;
 
                     int count = 0;
-                    var files = new FileEnumerator(Source, "*.*");
+                    var files = new FileEnumerator(Source, FileMasks, Recurse);
                     if (ShouldProcess(Source, "import"))
                     {
                         foreach (var file in files.GetFiles())

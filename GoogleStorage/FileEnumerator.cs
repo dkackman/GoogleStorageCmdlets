@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 
@@ -10,12 +8,14 @@ namespace GoogleStorage
     {
         private DirectoryInfo _root;
         private string[] _fileMasks;
+        private bool _resurse;
 
-        public FileEnumerator(string root, string mask)
+        public FileEnumerator(string root, string mask, bool recurse)
         {
             Debug.Assert(Directory.Exists(root));
             _root = new DirectoryInfo(root);
             _fileMasks = mask.Split(';');
+            _resurse = recurse;
         }
 
         public IEnumerable<FileInfo> GetFiles()
@@ -30,17 +30,20 @@ namespace GoogleStorage
         {
             foreach (var mask in _fileMasks)
             {
-                foreach (var file in dir.GetFiles(mask))
+                foreach (var file in dir.GetFiles(mask.Trim()))
                 {
                     yield return file;
                 }
             }
 
-            foreach (var subDir in dir.GetDirectories())
+            if (_resurse)
             {
-                foreach (var file in ScanDirectory(subDir))
+                foreach (var subDir in dir.GetDirectories())
                 {
-                    yield return file;
+                    foreach (var file in ScanDirectory(subDir))
+                    {
+                        yield return file;
+                    }
                 }
             }
         }

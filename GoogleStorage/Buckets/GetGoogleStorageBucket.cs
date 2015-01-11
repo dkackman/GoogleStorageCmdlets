@@ -7,12 +7,22 @@ namespace GoogleStorage.Buckets
     [Cmdlet(VerbsCommon.Get, "GoogleStorageBucket")]
     public class GetGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The id of the bucket
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// Flag indicating whether to display the contents of the bucket rather than show its properties
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter ListContents { get; set; }
 
+        /// <summary>
+        /// The property name of each bucket to display. If not set Bucket name is displayed.
+        /// Ignored if Verbose flag is set
+        /// </summary>
         [Parameter(Mandatory = false)]
         public string DisplayProperty { get; set; }
 

@@ -7,9 +7,17 @@ namespace GoogleStorage.Buckets
     [Cmdlet(VerbsCommon.Get, "GoogleStorageBuckets")]
     public class GetGoogleStorageBuckets : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The Google Storage project name 
+        /// If not set uses <see cref="GoogleStorage.Config.SetGoogleStorageConfig.Project"/>
+        /// </summary>
         [Parameter(Mandatory = false)]
         public string Project { get; set; }
 
+        /// <summary>
+        /// The property name of each bucket to display. If not set Bucket name is dispalyed.
+        /// Ignored if Verbose flag is set
+        /// </summary>
         [Parameter(Mandatory = false)]
         public string DisplayProperty { get; set; }
 

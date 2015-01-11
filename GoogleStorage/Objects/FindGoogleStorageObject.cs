@@ -6,9 +6,15 @@ namespace GoogleStorage.Objects
     [Cmdlet(VerbsCommon.Find, "GoogleStorageObject")]
     public class FindGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The bucket where the object exists
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// The name of the object
+        /// </summary>
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string ObjectName { get; set; }
 

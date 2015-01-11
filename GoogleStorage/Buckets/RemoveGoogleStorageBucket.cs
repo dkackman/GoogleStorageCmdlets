@@ -6,9 +6,15 @@ namespace GoogleStorage.Buckets
     [Cmdlet(VerbsCommon.Remove, "GoogleStorageBucket", SupportsShouldProcess = true)]
     public class RemoveGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The id of the bucket to remove
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// Flag indicating whetehr to remove bucket without prompting
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
 

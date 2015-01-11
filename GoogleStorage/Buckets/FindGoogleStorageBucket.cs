@@ -6,6 +6,9 @@ namespace GoogleStorage.Buckets
     [Cmdlet(VerbsCommon.Find, "GoogleStorageBucket")]
     public class FindGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The name of the Bucket to find
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 

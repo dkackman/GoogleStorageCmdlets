@@ -7,9 +7,16 @@ namespace GoogleStorage.Buckets
     [Cmdlet(VerbsCommon.Add, "GoogleStorageBucket")]
     public class AddGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The Google Storage project name where the bucket will be added
+        /// If not set uses <see cref="GoogleStorage.Config.SetGoogleStorageConfig.Project"/>
+        /// </summary>
         [Parameter(Mandatory = false)]
         public string Project { get; set; }
 
+        /// <summary>
+        /// The name of the bucket to add
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0)]
         public string Bucket { get; set; }
 

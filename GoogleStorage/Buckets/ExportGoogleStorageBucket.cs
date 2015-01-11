@@ -10,15 +10,29 @@ namespace GoogleStorage.Buckets
     [Cmdlet(VerbsData.Export, "GoogleStorageBucket", SupportsShouldProcess = true)]
     public class ExportGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The id of the Bucket to export
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// The full path to the folder where the bucket will be exported.
+        /// Remote folders will be reflected beneath this location
+        /// </summary>
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string Destination { get; set; }
 
+        /// <summary>
+        /// Flag indicating whether to save the meta data of each remote object along witht the file.
+        /// Meta data is persisted in a file with the name "{remote_object_name}.metadata.json"
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter IncludeMetaData { get; set; }
 
+        /// <summary>
+        /// Flag indicating wwhether to overwirte local files without promting if they already exist
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
 

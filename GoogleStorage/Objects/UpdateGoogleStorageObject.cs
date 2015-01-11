@@ -6,12 +6,21 @@ namespace GoogleStorage.Objects
     [Cmdlet(VerbsData.Update, "GoogleStorageObject", SupportsShouldProcess = true)]
     public class UpdateGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The bucket where the object exists
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// The name of the object
+        /// </summary>
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string ObjectName { get; set; }
 
+        /// <summary>
+        /// The name of the object's property to update
+        /// </summary>
         [Parameter(Mandatory = true, Position = 2, ValueFromPipelineByPropertyName = true)]
         public string PropertyName { get; set; }
 
@@ -22,6 +31,9 @@ namespace GoogleStorage.Objects
         [Parameter(Mandatory = false, Position = 3, ValueFromPipelineByPropertyName = true)]
         public string PropertyValue { get; set; }
 
+        /// <summary>
+        /// Flag indicating whetehr to update the property without prompting the user
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
 

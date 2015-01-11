@@ -6,12 +6,21 @@ namespace GoogleStorage.Objects
     [Cmdlet(VerbsCommon.Remove, "GoogleStorageObject", SupportsShouldProcess = true)]
     public class RemoveGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The bucket where the object exists
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// The name of the object to remove
+        /// </summary>
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string ObjectName { get; set; }
 
+        /// <summary>
+        /// Flag indicating whther to remove the object without prompting the user
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
 
