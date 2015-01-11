@@ -23,7 +23,7 @@ namespace GoogleStorage.Objects
                 if (ShouldProcess(path, "Remove"))
                 {
                     var msg = string.Format("Do you want to remove the object {0}?", path);
-                    if (Force || ShouldContinue(msg, "Remove bucket?"))
+                    if (Force || ShouldContinue(msg, "Remove object?"))
                     {
                         using (var api = CreateApiWrapper())
                         {

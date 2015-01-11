@@ -4,16 +4,21 @@ using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Diagnostics;
 
-using GoogleStorage;
-
 namespace GoogleStorage.Config
 {
     [Cmdlet(VerbsSecurity.Grant, "GoogleStorageAccess")]
     public class GrantGoogleStorageAccess : GoogleStorageCmdlet
     {
+        /// <summary>
+        /// Flag indicating whether to save the auth result
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter Persist { get; set; }
 
+        /// <summary>
+        /// Flag indicating whether the Cmdlet will attempt to open a browser nevigated to
+        /// the verification url. Uses the shell to open the browser. Will not work in headless oepration
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter ShowBrowser { get; set; }
 
@@ -66,15 +71,13 @@ namespace GoogleStorage.Config
         private static async Task<dynamic> ConfirmAuth(dynamic response, dynamic config, CancellationToken cancelToken)
         {
             var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
-            dynamic access = await oauth.WaitForConfirmation(response, config, cancelToken);
-            return access;
+            return await oauth.WaitForConfirmation(response, config, cancelToken);
         }
 
         private static async Task<dynamic> StartAuth(dynamic config, CancellationToken cancelToken)
         {
             var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
-            dynamic response = await oauth.StartAuthentication(config, cancelToken);
-            return response;
+            return await oauth.StartAuthentication(config, cancelToken);
         }
     }
 }

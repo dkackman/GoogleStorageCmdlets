@@ -19,11 +19,7 @@ namespace GoogleStorage.Config
             }
             catch (Exception e)
             {
-                WriteError(new ErrorRecord(
-                        e,
-                        "GetGoogleStorageConfig",
-                        ErrorCategory.NotSpecified,
-                        "config"));
+                WriteError(new ErrorRecord(e, "GetGoogleStorageConfig", ErrorCategory.NotSpecified, "config"));
             }
         }
     }

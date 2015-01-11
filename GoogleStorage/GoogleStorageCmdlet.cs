@@ -33,12 +33,12 @@ namespace GoogleStorage
             }
         }
 
-        protected string GetProjectName(string propertyValue)
+        protected string GetProjectName(string projectName)
         {
-            // a project set at a cmlet property will take precendence over the config
-            if (!string.IsNullOrEmpty(propertyValue))
+            // a project set at a cmdlet property will take precendence over the config
+            if (!string.IsNullOrEmpty(projectName))
             {
-                return propertyValue;
+                return projectName;
             }
 
             dynamic config = GetConfig();
@@ -110,7 +110,7 @@ namespace GoogleStorage
         {
             if (_cancelTokenSource == null)
             {
-                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccsing was not called.");
+                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccessing was not called.");
             }
 
             return _cancelTokenSource.Token;
@@ -120,7 +120,7 @@ namespace GoogleStorage
         {
             if (_cancelTokenSource == null)
             {
-                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccsing was not called.");
+                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccessing was not called.");
             }
 
             if (!_cancelTokenSource.IsCancellationRequested)

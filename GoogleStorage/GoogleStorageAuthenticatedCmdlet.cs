@@ -10,11 +10,13 @@ namespace GoogleStorage
     {
         private const string UserAgent = "GoogleStorageCmdlets/0.1";
 
+        /// <summary>
+        /// Flag indicating that no authentication is needed for the command execution
+        /// i.e. the storage item being operated on is publically shared
+        /// Stored authentication will be ignored
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter NoAuth { get; set; }
-
-        [Parameter(Mandatory = false)]
-        public SwitchParameter Persist { get; set; }
 
         protected GoogleStorageApi CreateApiWrapper()
         {
@@ -29,7 +31,7 @@ namespace GoogleStorage
             return new GoogleStorageApi(project, UserAgent, access_token, cancelToken);
         }
 
-        protected async Task<string> GetAccessToken(CancellationToken cancelToken)
+        protected async Task<string> GetAccessToken(CancellationToken cancelToken, bool persist = true)
         {
             if (NoAuth)
             {
@@ -53,7 +55,7 @@ namespace GoogleStorage
                 access = await oauth.RefreshAccessToken(access, GetConfig(), cancelToken);
                 
                 var storage = new PersistantStorage();
-                SetPersistedVariableValue("access", access, Persist || storage.ObjectExists("access")); // re-persist access token if already saved
+                SetPersistedVariableValue("access", access, persist || storage.ObjectExists("access")); // re-persist access token if already saved
             }
 
             SecureString token = access.access_token;
