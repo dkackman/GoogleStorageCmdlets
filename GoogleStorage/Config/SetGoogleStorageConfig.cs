@@ -4,6 +4,9 @@ using System.Security;
 
 namespace GoogleStorage.Config
 {
+    /// <summary>
+    /// Sets the Google Storage configuration
+    /// </summary>
     [Cmdlet(VerbsCommon.Set, "GoogleStorageConfig")]
     public class SetGoogleStorageConfig : GoogleStorageCmdlet
     {

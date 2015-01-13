@@ -3,6 +3,10 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
 {
+    /// <summary>
+    /// Removes an empty Bucket
+    /// (return http 409 if bucket is not empty)
+    /// </summary>
     [Cmdlet(VerbsCommon.Remove, "GoogleStorageBucket", SupportsShouldProcess = true)]
     public class RemoveGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {

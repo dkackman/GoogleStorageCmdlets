@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Diagnostics;
 
 namespace GoogleStorage.Config
 {
+    /// <summary>
+    /// Initiates Oauth2 authentication and authorization for Google Storage
+    /// </summary>
     [Cmdlet(VerbsSecurity.Grant, "GoogleStorageAccess")]
     public class GrantGoogleStorageAccess : GoogleStorageCmdlet
     {
@@ -26,7 +27,7 @@ namespace GoogleStorage.Config
         {
             try
             {
-                dynamic config = GetConfig();
+                var config = GetConfig();
                 var cancelToken = GetCancellationToken();
 
                 var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);

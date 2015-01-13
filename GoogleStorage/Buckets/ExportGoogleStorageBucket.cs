@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace GoogleStorage.Buckets
 {
+    /// <summary>
+    /// Exports the contents of a Google Storage Buckets 
+    /// </summary>
     [Cmdlet(VerbsData.Export, "GoogleStorageBucket", SupportsShouldProcess = true)]
     public class ExportGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {

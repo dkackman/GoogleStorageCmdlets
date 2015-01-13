@@ -3,6 +3,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Config
 {
+    /// <summary>
+    /// Shows the current configuration
+    /// </summary>
     [Cmdlet(VerbsCommon.Get, "GoogleStorageConfig")]
     public class GetGoogleStorageConfig : GoogleStorageCmdlet
     {

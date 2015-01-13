@@ -3,6 +3,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
 {
+    /// <summary>
+    /// Inidactes whether a given Bucket exists or not
+    /// </summary>
     [Cmdlet(VerbsCommon.Find, "GoogleStorageBucket")]
     public class FindGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {

@@ -53,15 +53,15 @@ namespace GoogleStorage
                     }
                 };
 
+            Task[] tasks = new Task[TaskCount];
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                tasks[i] = Task.Run(consumeInput, cancelToken);
+            }
+
             // these are the worker threads 
             await Task.Run(() =>
                 {
-                    Task[] tasks = new Task[TaskCount];
-                    for (int i = 0; i < tasks.Length; i++)
-                    {
-                        tasks[i] = Task.Run(consumeInput);
-                    }
-
                     Task.WaitAll(tasks, cancelToken);
                     Output.CompleteAdding(); // this signals the calling thread that all the work is done
                                              // because it will stop trying to iterate on the blocking enuemration

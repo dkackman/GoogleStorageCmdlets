@@ -4,6 +4,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
 {
+    /// <summary>
+    /// Retreives the properties or contents of a Bucket
+    /// </summary>
     [Cmdlet(VerbsCommon.Get, "GoogleStorageBucket")]
     public class GetGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {

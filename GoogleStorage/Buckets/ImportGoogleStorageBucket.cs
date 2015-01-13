@@ -5,6 +5,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
 {
+    /// <summary>
+    /// Imports the contents of a file folder into a Bucket
+    /// </summary>
     [Cmdlet(VerbsData.Import, "GoogleStorageBucket", SupportsShouldProcess = true)]
     public class ImportGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {

@@ -4,6 +4,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
 {
+    /// <summary>
+    /// Adds a Bucket to Google Storage
+    /// </summary>
     [Cmdlet(VerbsCommon.Add, "GoogleStorageBucket")]
     public class AddGoogleStorageBucket : GoogleStorageAuthenticatedCmdlet
     {

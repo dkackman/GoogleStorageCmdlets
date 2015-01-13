@@ -4,6 +4,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Buckets
 {
+    /// <summary>
+    /// Lists all the Buckets in a Project
+    /// </summary>
     [Cmdlet(VerbsCommon.Get, "GoogleStorageBuckets")]
     public class GetGoogleStorageBuckets : GoogleStorageAuthenticatedCmdlet
     {
