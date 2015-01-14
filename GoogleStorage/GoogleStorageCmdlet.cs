@@ -156,11 +156,22 @@ namespace GoogleStorage
             Cancel();
         }
 
-        protected void WriteAggregateException(AggregateException e)
+        protected void HandleException(Exception e)
         {
-            foreach (var error in e.InnerExceptions)
+            if (e is HaltCommandException || e is PipelineStoppedException || e is OperationCanceledException)
             {
-                WriteError(new ErrorRecord(error, error.Message, ErrorCategory.NotSpecified, null));
+                WriteError(new ErrorRecord(e, e.Message, ErrorCategory.OperationStopped, null));
+            }
+            else if (e is AggregateException)
+            {
+                foreach (var error in ((AggregateException)e).InnerExceptions)
+                {
+                    HandleException(e);
+                }
+            }
+            else
+            {
+                WriteError(new ErrorRecord(e, e.Message, ErrorCategory.NotSpecified, null));
             }
         }
     }

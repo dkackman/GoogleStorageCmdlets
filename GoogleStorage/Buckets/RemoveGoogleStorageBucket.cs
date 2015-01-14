@@ -40,19 +40,9 @@ namespace GoogleStorage.Buckets
                     }
                 }   
             }
-            catch (HaltCommandException)
-            {
-            }
-            catch (PipelineStoppedException)
-            {
-            }
-            catch (AggregateException e)
-            {
-                WriteAggregateException(e);
-            }
             catch (Exception e)
             {
-                WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
+                HandleException(e);
             }
         }
     }

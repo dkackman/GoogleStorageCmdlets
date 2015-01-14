@@ -29,7 +29,10 @@ namespace GoogleStorage.Buckets
             try
             {
                 var project = GetProjectName(Project);
-                Debug.Assert(!string.IsNullOrEmpty(project));
+                if (string.IsNullOrEmpty(project))
+                {
+                    throw new InvalidOperationException("No project in configuration or as Cmdlet parameter");
+                }
 
                 using (var api = CreateApiWrapper(project))
                 {
@@ -53,19 +56,9 @@ namespace GoogleStorage.Buckets
                     }
                 }
             }
-            catch (HaltCommandException)
-            {
-            }
-            catch (PipelineStoppedException)
-            {
-            }
-            catch (AggregateException e)
-            {
-                WriteAggregateException(e);
-            }
             catch (Exception e)
             {
-                WriteError(new ErrorRecord(e, e.Message, ErrorCategory.ReadError, null));
+                HandleException(e);
             }
         }
     }
