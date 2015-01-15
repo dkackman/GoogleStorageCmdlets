@@ -8,11 +8,32 @@ using System.IO;
 using System.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Management.Automation;
 
 namespace GoogleStorage
 {
     static class Extensions
     {
+        public static ErrorCategory GetCategory(this Exception e)
+        {
+            if (e is HaltCommandException || e is PipelineStoppedException || e is OperationCanceledException)
+            {
+                return ErrorCategory.OperationStopped;
+            }
+            else if (e is InvalidOperationException)
+            {
+                return ErrorCategory.InvalidOperation;
+            }
+            else if (e is ItemNotFoundException)
+            {
+                return ErrorCategory.ObjectNotFound;
+            }
+            else
+            {
+                return ErrorCategory.NotSpecified;
+            }
+        }
+
         public static T WaitForResult<T>(this Task<T> task, CancellationToken cancelToken)
         {
             task.Wait(cancelToken);

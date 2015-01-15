@@ -56,6 +56,11 @@ namespace GoogleStorage.Buckets
                 using(var api = CreateApiWrapper())
                 using (var uploadPipeline = new Stage<Tuple<FileInfo, string>, Tuple<FileInfo, dynamic>>())
                 {
+                    if(!api.FindBucket(Bucket).WaitForResult(GetCancellationToken()))
+                    {
+                        throw new ItemNotFoundException(string.Format("The bucket {0} does not exist. Call Add-GoogleStorageBucket first.", Bucket));
+                    }
+
                     // this is the delgate that does the uploading
                     Func<Tuple<FileInfo, string>, Task<Tuple<FileInfo, dynamic>>> func = async (input) =>
                     {
@@ -77,20 +82,18 @@ namespace GoogleStorage.Buckets
                     {
                         foreach (var file in files.GetFiles())
                         {
-                            var name = file.Name;
-
                             bool process = true;
                             // check yesToAll so we don't check the remote file if the user has already indicated they don't care
-                            bool exists = api.FindObject(Bucket, name).WaitForResult(GetCancellationToken());
+                            bool exists = api.FindObject(Bucket, file.Name).WaitForResult(GetCancellationToken());
                             if (!yesToAll && !Force && exists)
                             {
-                                var msg = string.Format("Do you want to overwrite the file {0}?", name);
+                                var msg = string.Format("Do you want to overwrite the file {0}?", file.Name);
                                 process = Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
                             }
 
                             if (process)
                             {
-                                uploadPipeline.Input.Add(Tuple.Create(file, name), api.CancellationToken);
+                                uploadPipeline.Input.Add(Tuple.Create(file, Bucket), api.CancellationToken);
                                 count++;
                             }
                         }

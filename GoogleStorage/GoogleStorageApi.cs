@@ -80,11 +80,11 @@ namespace GoogleStorage
             return await _googleStorage.b(bucket).o(objectName).patch(CancellationToken, body, fields: propertName);
         }
 
-        public async Task<dynamic> ImportObject(FileInfo file, string name)
+        public async Task<dynamic> ImportObject(FileInfo file, string bucket)
         {
             using (var stream = new StreamInfo(file.OpenRead(), file.GetContentType()))
             {
-                return await _googleStorageUpload.b.unit_tests.o.post(CancellationToken, stream, name: new PostUrlParam(name), uploadType: new PostUrlParam("media"));
+                return await _googleStorageUpload.b(bucket).o.post(CancellationToken, stream, name: new PostUrlParam(file.Name), uploadType: new PostUrlParam("media"));
             }
         }
 
