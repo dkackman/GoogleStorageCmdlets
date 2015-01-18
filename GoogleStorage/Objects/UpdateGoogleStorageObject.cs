@@ -45,7 +45,7 @@ namespace GoogleStorage.Objects
                 {
                     if (!api.FindBucket(Bucket).WaitForResult(GetCancellationToken()))
                     {
-                        throw new ItemNotFoundException(string.Format("The bucket {0} does not exist. Call Add-GoogleStorageBucket first.", Bucket));
+                        throw new ItemNotFoundException(string.Format("The bucket {0} does not exist.", Bucket));
                     }
 
                     if (!api.FindObject(Bucket, ObjectName).WaitForResult(GetCancellationToken()))
