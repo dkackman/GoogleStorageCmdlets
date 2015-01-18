@@ -28,7 +28,6 @@ namespace GoogleStorage.Buckets
             {
                 using (var api = CreateApiWrapper())
                 {
-
                     if (ListContents)
                     {
                         var contents = api.GetBucketContents(Bucket).WaitForResult(GetCancellationToken());

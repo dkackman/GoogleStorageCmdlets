@@ -15,14 +15,12 @@ namespace GoogleStorage.Config
             {
                 var config = GetConfig();
 
-                if (config != null)
+                if (config == null)
                 {
-                    WriteObject(config);
+                    throw new ItemNotFoundException("Configuration not set. Call Set-GoogleStorageConfig");
                 }
-                else
-                {
-                    WriteVerbose("Configuration not set. Call Set-GoogleStorageConfig");
-                }
+
+                WriteDynamicObject(config);
             }
             catch (Exception e)
             {
