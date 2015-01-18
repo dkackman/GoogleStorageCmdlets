@@ -162,7 +162,7 @@ namespace GoogleStorage
             {
                 foreach (var error in ((AggregateException)e).InnerExceptions)
                 {
-                    HandleException(e);
+                    HandleException(error);
                 }
             }
             else
