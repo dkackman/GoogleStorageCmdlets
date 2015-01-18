@@ -13,8 +13,11 @@ namespace GoogleStorage
 
         protected void WriteDynamicObject(dynamic o)
         {
+            var d = o as IDictionary<string, object>;
+            Debug.Assert(d != null);
+
             var record = new PSObject();
-            foreach (var kvp in ((IDictionary<string, object>)o))
+            foreach (var kvp in d)
             {
                 record.Properties.Add(new PSVariableProperty(new PSVariable(kvp.Key, kvp.Value)));
             }
