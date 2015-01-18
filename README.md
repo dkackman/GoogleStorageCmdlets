@@ -11,9 +11,10 @@ Working:
 - OAuth2 workflow
 - Authenticated access to buckets
 - bucket export (authenticated and unauthenticated)
-
-TODO:
 - Object cmdlets
 - bucket import
 - single object Import/Export (i.e. upload/download)
+- 
+TODO:
 - ACL management
+- object and bucket sharing/unsharing
