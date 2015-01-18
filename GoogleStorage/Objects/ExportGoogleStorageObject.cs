@@ -4,6 +4,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
+    /// <summary>
+    /// Downloads an object from google storage
+    /// </summary>
     [Cmdlet(VerbsData.Export, "GoogleStorageObject", SupportsShouldProcess = true)]
     public class ExportGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {

@@ -3,6 +3,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
+    /// <summary>
+    /// Updates a meta-data property of a remote object in Google Storage
+    /// </summary>
     [Cmdlet(VerbsData.Update, "GoogleStorageObject", SupportsShouldProcess = true)]
     public class UpdateGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {

@@ -4,18 +4,33 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
+    /// <summary>
+    /// Uploads a file into a google storage bucket
+    /// </summary>
     [Cmdlet(VerbsData.Import, "GoogleStorageObject", SupportsShouldProcess = true)]
     public class ImportGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {
+        /// <summary>
+        /// The name of the target bucket
+        /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
+        /// <summary>
+        /// Full path to the file to upload
+        /// </summary>
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string Source { get; set; }
 
+        /// <summary>
+        /// Optional name of the remote object. The local file name is used if not supplied
+        /// </summary>
         [Parameter(Mandatory = false, Position = 2, ValueFromPipelineByPropertyName = true)]
         public string ObjectName { get; set; }
 
+        /// <summary>
+        /// Flag inidcating to not prompt the before overwriting the remote file if it exists
+        /// </summary>
         [Parameter(Mandatory = false)]
         public SwitchParameter Force { get; set; }
 

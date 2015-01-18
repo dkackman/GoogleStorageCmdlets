@@ -3,6 +3,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
+    /// <summary>
+    /// Deletes a remote object from google storage
+    /// </summary>
     [Cmdlet(VerbsCommon.Remove, "GoogleStorageObject", SupportsShouldProcess = true)]
     public class RemoveGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {

@@ -3,6 +3,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
+    /// <summary>
+    /// Indicates whether an object exists in a particular bucket
+    /// </summary>
     [Cmdlet(VerbsCommon.Find, "GoogleStorageObject")]
     public class FindGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {

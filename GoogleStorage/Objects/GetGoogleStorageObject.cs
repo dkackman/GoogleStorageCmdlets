@@ -3,6 +3,9 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
+    /// <summary>
+    /// Retreives the properties of a google storage object
+    /// </summary>
     [Cmdlet(VerbsCommon.Get, "GoogleStorageObject")]
     public class GetGoogleStorageObject : GoogleStorageAuthenticatedCmdlet
     {
