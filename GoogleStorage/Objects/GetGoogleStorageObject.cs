@@ -21,13 +21,6 @@ namespace GoogleStorage.Objects
         [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string ObjectName { get; set; }
 
-        /// <summary>
-        /// The property name of the object to display. If not set Object name is displayed.
-        /// Ignored if Verbose flag is set
-        /// </summary>
-        [Parameter(Mandatory = false)]
-        public string DisplayProperty { get; set; }
-
         protected override void ProcessRecord()
         {
             try
@@ -36,15 +29,7 @@ namespace GoogleStorage.Objects
                 {
                     var item = api.GetObject(Bucket, ObjectName).WaitForResult(GetCancellationToken());
 
-                    bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
-                    if (verbose)
-                    {
-                        WriteDynamicObject(item, DisplayProperty);
-                    }
-                    else
-                    {
-                        WriteObject(item.name);
-                    }
+                    WriteDynamicObject(item);
                 }
             }
             catch (Exception e)

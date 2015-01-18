@@ -17,13 +17,6 @@ namespace GoogleStorage.Buckets
         [Parameter(Mandatory = false)]
         public string Project { get; set; }
 
-        /// <summary>
-        /// The property name of each bucket to display. If not set Bucket name is dispalyed.
-        /// Ignored if Verbose flag is set
-        /// </summary>
-        [Parameter(Mandatory = false)]
-        public string DisplayProperty { get; set; }
-
         protected override void ProcessRecord()
         {
             try
@@ -38,21 +31,9 @@ namespace GoogleStorage.Buckets
                 {
                     dynamic result = api.GetBuckets().WaitForResult(GetCancellationToken());
 
-                    bool verbose = this.MyInvocation.BoundParameters.ContainsKey("Verbose");
                     foreach (var item in result.items)
                     {
-                        if (verbose)
-                        {
-                            WriteObject(item, true);
-                        }
-                        else if (!string.IsNullOrEmpty(DisplayProperty))
-                        {
-                            WriteDynamicObject(item, DisplayProperty);
-                        }
-                        else
-                        {
-                            WriteObject(item.id);
-                        }
+                        WriteDynamicObject(item);
                     }
                 }
             }

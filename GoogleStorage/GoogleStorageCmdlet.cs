@@ -11,26 +11,14 @@ namespace GoogleStorage
     {
         private CancellationTokenSource _cancelTokenSource;
 
-        protected void WriteDynamicObject(dynamic o, string propertyName = null)
+        protected void WriteDynamicObject(dynamic o)
         {
-            if (string.IsNullOrEmpty(propertyName))
+            var record = new PSObject();
+            foreach (var kvp in ((IDictionary<string, object>)o))
             {
-                WriteObject(o);
+                record.Properties.Add(new PSVariableProperty(new PSVariable(kvp.Key, kvp.Value)));
             }
-            else
-            {                
-                IDictionary<string, object> d = o as IDictionary<string, object>;
-                Debug.Assert(d != null); 
-                
-                if (d.ContainsKey(propertyName))
-                {
-                    WriteObject(d[propertyName]);
-                }
-                else
-                {
-                    throw new InvalidOperationException(string.Format("Property {0} does not exist on result object", propertyName));
-                }
-            }
+            WriteObject(record);
         }
 
         protected string GetProjectName(string projectName)
