@@ -28,6 +28,10 @@ namespace GoogleStorage
             {
                 return ErrorCategory.ObjectNotFound;
             }
+            else if (e is AccessViolationException)
+            {
+                return ErrorCategory.SecurityError;
+            }
             else
             {
                 return ErrorCategory.NotSpecified;

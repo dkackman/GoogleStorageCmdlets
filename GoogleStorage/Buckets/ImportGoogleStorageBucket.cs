@@ -87,8 +87,8 @@ namespace GoogleStorage.Buckets
                             bool exists = api.FindObject(Bucket, file.Name).WaitForResult(GetCancellationToken());
                             if (!yesToAll && !Force && exists)
                             {
-                                var msg = string.Format("Do you want to overwrite the file {0}?", file.Name);
-                                process = Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
+                                var msg = string.Format("Do you want to overwrite the file {0} in bucket {1}?", file.Name, Bucket);
+                                process = Force || ShouldContinue(msg, "Overwrite remote file?", ref yesToAll, ref noToAll);
                             }
 
                             if (process)

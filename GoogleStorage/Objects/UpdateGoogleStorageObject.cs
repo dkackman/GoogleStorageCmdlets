@@ -41,11 +41,21 @@ namespace GoogleStorage.Objects
         {
             try
             {
-                if (ShouldProcess(string.Format("{0}/{1}", Bucket, ObjectName), string.Format("Set {0} to {1}", PropertyName, PropertyValue)))
+                using (var api = CreateApiWrapper())
                 {
-                    if (Force || ShouldContinue(string.Format("Set object {0}/{1} {2} to {3}?", Bucket, ObjectName, PropertyName, PropertyValue), "Update Object?"))
+                    if (!api.FindBucket(Bucket).WaitForResult(GetCancellationToken()))
                     {
-                        using (var api = CreateApiWrapper())
+                        throw new ItemNotFoundException(string.Format("The bucket {0} does not exist. Call Add-GoogleStorageBucket first.", Bucket));
+                    }
+
+                    if (!api.FindObject(Bucket, ObjectName).WaitForResult(GetCancellationToken()))
+                    {
+                        throw new ItemNotFoundException(string.Format("The object {0} does not exist in bucket {1}.", ObjectName, Bucket));
+                    }
+
+                    if (ShouldProcess(string.Format("{0}/{1}", Bucket, ObjectName), string.Format("Set {0} to {1}", PropertyName, PropertyValue)))
+                    {
+                        if (Force || ShouldContinue(string.Format("Set object {0}/{1} {2} to {3}?", Bucket, ObjectName, PropertyName, PropertyValue), "Update Object?"))
                         {
                             var result = api.UpdateObjectMetaData(Bucket, ObjectName, PropertyName, PropertyValue).WaitForResult(GetCancellationToken());
 
@@ -53,7 +63,7 @@ namespace GoogleStorage.Objects
                             WriteVerbose(string.Format("Object {0}/{1} {2} property set to {3}", Bucket, ObjectName, PropertyName, PropertyValue));
                         }
                     }
-                }          
+                }
             }
             catch (Exception e)
             {
