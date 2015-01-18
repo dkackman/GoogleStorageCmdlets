@@ -14,7 +14,7 @@ Working:
 - Object cmdlets
 - bucket import
 - single object Import/Export (i.e. upload/download)
-- 
+
 TODO:
 - ACL management
 - object and bucket sharing/unsharing
