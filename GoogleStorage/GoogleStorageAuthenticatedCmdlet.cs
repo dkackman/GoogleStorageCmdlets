@@ -32,7 +32,7 @@ namespace GoogleStorage
                 return null;
             }
 
-            var access = this.GetPersistedVariableValue<dynamic>("access", d =>
+            var access = GetPersistedVariableValue<dynamic>("access", d =>
                 {
                     d.access_token = ((string)d.access_token).FromEncyptedString();
                     return d;

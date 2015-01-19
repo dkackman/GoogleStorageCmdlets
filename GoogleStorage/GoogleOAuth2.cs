@@ -48,7 +48,9 @@ namespace GoogleStorage
 
             response.refresh_token = access.refresh_token; // the new access token doesn't have a new refresh token so move our current one here for long term storage
             response.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(response.expires_in);
-            SecureAccessToken(response);
+
+            // replace the plain text access_token with a securestring
+            access.access_token = ((string)access.access_token).ToSecureString();
 
             return response;
         }
@@ -81,7 +83,8 @@ namespace GoogleStorage
                     if (tokenResponse.access_token != null)
                     {
                         tokenResponse.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(tokenResponse.expires_in);
-                        SecureAccessToken(tokenResponse);
+                        // replace the plain text access_token with a securestring
+                        tokenResponse.access_token = ((string)tokenResponse.access_token).ToSecureString(); 
                         return tokenResponse;
                     }
                 }
@@ -93,17 +96,6 @@ namespace GoogleStorage
             }
 
             throw new OperationCanceledException("Authorization from user timed out");
-        }
-
-        private static void SecureAccessToken(dynamic access)
-        {
-            string token = access.access_token;
-
-            SecureString secure = new SecureString();
-            Array.ForEach(token.ToArray(), secure.AppendChar);
-            secure.MakeReadOnly();
-
-            access.access_token = secure;
         }
     }
 }

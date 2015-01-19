@@ -80,6 +80,15 @@ namespace GoogleStorage
             }
         }
 
+        public static SecureString ToSecureString(this string s)
+        {
+            SecureString secure = new SecureString();
+            Array.ForEach(s.ToArray(), secure.AppendChar);
+            secure.MakeReadOnly();
+
+            return secure;
+        }
+
         public static string ToEncyptedString(this SecureString s)
         {
             Command command = new Command("ConvertFrom-SecureString");
