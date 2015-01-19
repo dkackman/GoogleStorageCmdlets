@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using System.IO;
 using System.Net.Http;
 using System.Dynamic;
-using System.IO;
+using System.Security;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
@@ -23,7 +24,7 @@ namespace GoogleStorage
 
         private readonly FileDownloader _downloader;
 
-        public GoogleStorageApi(string agent, string token, CancellationToken cancelToken)
+        public GoogleStorageApi(string agent, SecureString token, CancellationToken cancelToken)
         {
             _downloader = new FileDownloader(agent, token);
             CancellationToken = cancelToken;
@@ -145,17 +146,17 @@ namespace GoogleStorage
             return await _googleStorage.b.post(CancellationToken, args, project: new PostUrlParam(project));
         }
 
-        private static dynamic CreateClient(string agent, string access_token)
+        private static dynamic CreateClient(string agent, SecureString access_token)
         {
             var defaults = new DynamicRestClientDefaults()
             {
                 UserAgent = agent,
             };
 
-            if (!string.IsNullOrEmpty(access_token))
+            if (access_token != null)
             {
                 defaults.AuthScheme = "OAuth";
-                defaults.AuthToken = access_token;
+                defaults.AuthToken = access_token.ToUnsecureString();
             }
 
             return new DynamicRestClient("https://www.googleapis.com/", defaults);

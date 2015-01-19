@@ -20,16 +20,16 @@ namespace GoogleStorage
         protected GoogleStorageApi CreateApiWrapper()
         {
             var cancelToken = GetCancellationToken();
-            string access_token = GetAccessToken().WaitForResult(cancelToken);
+            var access_token = GetAccessToken().WaitForResult(cancelToken);
 
             return new GoogleStorageApi(UserAgent, access_token, cancelToken);
         }
 
-        protected async Task<string> GetAccessToken(bool persist = true)
+        protected async Task<SecureString> GetAccessToken(bool persist = true)
         {
             if (NoAuth)
             {
-                return "";
+                return null;
             }
 
             var access = this.GetPersistedVariableValue<dynamic>("access", d =>
@@ -52,8 +52,7 @@ namespace GoogleStorage
                 SetPersistedVariableValue("access", access, persist || storage.ObjectExists("access")); // re-persist access token if already saved
             }
 
-            SecureString token = access.access_token;
-            return token.ToUnsecureString();
+            return access.access_token;
         }
     }
 }

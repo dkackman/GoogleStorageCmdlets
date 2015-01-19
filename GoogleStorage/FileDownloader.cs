@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security;
 
 namespace GoogleStorage
 {
@@ -12,7 +13,7 @@ namespace GoogleStorage
     {
         private readonly HttpClient _client;
 
-        public FileDownloader(string userAgent, string access_token)
+        public FileDownloader(string userAgent, SecureString access_token)
         {
             _client = CreateHttpClient(userAgent, access_token);
         }
@@ -41,7 +42,7 @@ namespace GoogleStorage
             return contentType;
         }
 
-        private static HttpClient CreateHttpClient(string agent, string access_token)
+        private static HttpClient CreateHttpClient(string agent, SecureString access_token)
         {
             var handler = new HttpClientHandler();
             if (handler.SupportsAutomaticDecompression)
@@ -63,9 +64,9 @@ namespace GoogleStorage
                 client.DefaultRequestHeaders.UserAgent.Add(productHeader);
             }
 
-            if (!string.IsNullOrEmpty(access_token))
+            if (access_token != null)
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", access_token);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", access_token.ToUnsecureString());
             }
 
             return client;
