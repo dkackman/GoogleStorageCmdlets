@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Threading;
+using System.Security;
 using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Security;
 
 namespace GoogleStorage
 {
@@ -21,12 +20,12 @@ namespace GoogleStorage
         protected GoogleStorageApi CreateApiWrapper()
         {
             var cancelToken = GetCancellationToken();
-            string access_token = GetAccessToken(cancelToken).WaitForResult(cancelToken);
+            string access_token = GetAccessToken().WaitForResult(cancelToken);
 
             return new GoogleStorageApi(UserAgent, access_token, cancelToken);
         }
 
-        protected async Task<string> GetAccessToken(CancellationToken cancelToken, bool persist = true)
+        protected async Task<string> GetAccessToken(bool persist = true)
         {
             if (NoAuth)
             {
@@ -47,7 +46,7 @@ namespace GoogleStorage
             if (DateTime.UtcNow >= access.expiry)
             {
                 var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
-                access = await oauth.RefreshAccessToken(access, GetConfig(), cancelToken);
+                access = await oauth.RefreshAccessToken(access, GetConfig(), GetCancellationToken());
                 
                 var storage = new PersistantStorage();
                 SetPersistedVariableValue("access", access, persist || storage.ObjectExists("access")); // re-persist access token if already saved
