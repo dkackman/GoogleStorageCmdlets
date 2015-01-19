@@ -16,8 +16,6 @@ namespace GoogleStorage
     {
         public const string AuthScope = "https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/devstorage.read_write";
 
-        public string Project { get; private set; }
-
         public CancellationToken CancellationToken { get; private set; }
 
         private readonly dynamic _googleStorage;
@@ -25,9 +23,8 @@ namespace GoogleStorage
 
         private readonly FileDownloader _downloader;
 
-        public GoogleStorageApi(string project, string agent, string token, CancellationToken cancelToken)
+        public GoogleStorageApi(string agent, string token, CancellationToken cancelToken)
         {
-            Project = project;
             _downloader = new FileDownloader(agent, token);
             CancellationToken = cancelToken;
 
@@ -107,9 +104,9 @@ namespace GoogleStorage
             }
         }
 
-        public async Task<dynamic> GetBuckets()
+        public async Task<dynamic> GetBuckets(string project)
         {
-            return await _googleStorage.b.get(CancellationToken, project: Project);
+            return await _googleStorage.b.get(CancellationToken, project: project);
         }
 
         public async Task<dynamic> GetBucket(string bucket)
@@ -140,12 +137,12 @@ namespace GoogleStorage
             await _googleStorage.b(bucket).delete(CancellationToken);
         }
 
-        public async Task<dynamic> AddBucket(string bucket)
+        public async Task<dynamic> AddBucket(string project, string bucket)
         {
             dynamic args = new ExpandoObject();
             args.name = bucket;
 
-            return await _googleStorage.b.post(CancellationToken, args, project: new PostUrlParam(Project));
+            return await _googleStorage.b.post(CancellationToken, args, project: new PostUrlParam(project));
         }
 
         private static dynamic CreateClient(string agent, string access_token)

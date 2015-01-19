@@ -33,9 +33,9 @@ namespace GoogleStorage.Buckets
                     throw new InvalidOperationException("No project in configuration or as Cmdlet parameter");
                 }
 
-                using (var api = CreateApiWrapper(project))
+                using (var api = CreateApiWrapper())
                 {
-                    dynamic result = api.AddBucket(Bucket).WaitForResult(GetCancellationToken());
+                    dynamic result = api.AddBucket(project, Bucket).WaitForResult(GetCancellationToken());
                     WriteVerbose(string.Format("Bucket {0} added to project {1}", Bucket, project));
                 }
             }

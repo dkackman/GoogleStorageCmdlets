@@ -20,15 +20,10 @@ namespace GoogleStorage
 
         protected GoogleStorageApi CreateApiWrapper()
         {
-            return CreateApiWrapper("");
-        }
-
-        protected GoogleStorageApi CreateApiWrapper(string project)
-        {
             var cancelToken = GetCancellationToken();
             string access_token = GetAccessToken(cancelToken).WaitForResult(cancelToken);
 
-            return new GoogleStorageApi(project, UserAgent, access_token, cancelToken);
+            return new GoogleStorageApi(UserAgent, access_token, cancelToken);
         }
 
         protected async Task<string> GetAccessToken(CancellationToken cancelToken, bool persist = true)
