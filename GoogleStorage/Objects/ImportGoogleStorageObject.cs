@@ -38,7 +38,8 @@ namespace GoogleStorage.Objects
         {
             try
             {
-                using (var api = CreateApiWrapper())
+                using (
+                    var api = CreateApiWrapper())
                 {
                     if (!api.FindBucket(Bucket).WaitForResult(GetCancellationToken()))
                     {
@@ -62,6 +63,7 @@ namespace GoogleStorage.Objects
                         if (process)
                         {
                             dynamic result = api.ImportObject(file, name, Bucket).WaitForResult(GetCancellationToken());
+                            WriteDynamicObject(result);
                             WriteVerbose(string.Format("Imported {0} to {1}", Source, result.name));
                         }
                     }

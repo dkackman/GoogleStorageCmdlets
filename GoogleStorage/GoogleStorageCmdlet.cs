@@ -11,7 +11,7 @@ namespace GoogleStorage
     {
         private CancellationTokenSource _cancelTokenSource;
 
-        protected void WriteDynamicObject(dynamic o)
+        private static PSObject ConvertToPSObject(dynamic o)
         {
             var d = o as IDictionary<string, object>;
             Debug.Assert(d != null);
@@ -19,9 +19,19 @@ namespace GoogleStorage
             var record = new PSObject();
             foreach (var kvp in d)
             {
-                record.Properties.Add(new PSVariableProperty(new PSVariable(kvp.Key, kvp.Value)));
+                // if the value is asub expando, convert it as well
+                var value = kvp.Value is ExpandoObject ? ConvertToPSObject(kvp.Value) : kvp.Value;
+
+                record.Properties.Add(new PSVariableProperty(new PSVariable(kvp.Key, value)));
             }
-            WriteObject(record);
+
+            return record;
+        }
+
+        protected void WriteDynamicObject(dynamic o)
+        {
+            var psObject = ConvertToPSObject(o);
+            WriteObject(psObject);
         }
 
         protected string GetProjectName(string projectName)

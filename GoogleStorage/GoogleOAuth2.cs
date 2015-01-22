@@ -49,7 +49,7 @@ namespace GoogleStorage
             response.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(response.expires_in);
 
             // replace the plain text access_token with a securestring
-            access.access_token = ((string)access.access_token).ToSecureString();
+            response.access_token = ((string)response.access_token).ToSecureString();
 
             return response;
         }
@@ -73,8 +73,8 @@ namespace GoogleStorage
             // here poll google for success
             while (time < expiration)
             {
-                cancelToken.ThrowIfCancellationRequested();
                 Thread.Sleep((int)interval * 1000);
+                cancelToken.ThrowIfCancellationRequested();
 
                 dynamic tokenResponse = await google.token.post(cancelToken, client_id: clientId, client_secret: clientSecret.ToUnsecureString(), code: confirmToken.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
                 try

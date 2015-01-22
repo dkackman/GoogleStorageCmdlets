@@ -109,6 +109,7 @@ namespace GoogleStorage.Buckets
                     int i = 0;
                     foreach (var item in uploadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))
                     {
+                        WriteDynamicObject(item.Item2);
                         WriteVerbose(string.Format("({0} of {1}) - Imported {2} to {3}", ++i, count, item.Item1.Name, item.Item2.name));
                     }
 

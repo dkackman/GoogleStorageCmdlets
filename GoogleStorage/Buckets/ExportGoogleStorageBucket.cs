@@ -97,6 +97,7 @@ namespace GoogleStorage.Buckets
                         // at which point we know the background threads are done and the enumeration will complete
                         foreach (var item in downloadPipeline.Output.GetConsumingEnumerable(api.CancellationToken))
                         {
+                            WriteObject(item.Item2);
                             WriteVerbose(string.Format("({0} of {1}) - Exported {2} to {3}", ++i, count, item.Item1.name, item.Item2));
                         }
 

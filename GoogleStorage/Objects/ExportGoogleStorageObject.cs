@@ -62,8 +62,8 @@ namespace GoogleStorage.Objects
 
                         if (process)
                         {
-                            api.ExportObject(new Tuple<dynamic, string>(item, path), IncludeMetaData).Wait(GetCancellationToken());                            
-
+                            api.ExportObject(new Tuple<dynamic, string>(item, path), IncludeMetaData).Wait(GetCancellationToken());
+                            WriteObject(path);
                             WriteVerbose(string.Format("Exported {0} to {1}", item.name, path));
                         }
                     }
