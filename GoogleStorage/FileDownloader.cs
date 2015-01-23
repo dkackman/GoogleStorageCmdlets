@@ -26,22 +26,6 @@ namespace GoogleStorage
             }
         }
 
-        private static string FormatContentType(string contentType)
-        {
-            if (string.IsNullOrEmpty(contentType))
-            {
-                return "";
-            }
-
-            var semi = contentType.IndexOf(';');
-            if (semi > -1)
-            {
-                return contentType.Substring(0, semi);
-            }
-
-            return contentType;
-        }
-
         private static HttpClient CreateHttpClient(string agent, SecureString access_token)
         {
             var handler = new HttpClientHandler();
