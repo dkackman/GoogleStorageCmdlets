@@ -111,10 +111,7 @@ namespace GoogleStorage
         {
             get
             {
-                if (_cancelTokenSource == null)
-                {
-                    throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccessing was not called.");
-                }
+                Debug.Assert(_cancelTokenSource != null);
 
                 return _cancelTokenSource.Token;
             }

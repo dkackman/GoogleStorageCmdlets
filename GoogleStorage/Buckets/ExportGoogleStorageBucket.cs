@@ -72,10 +72,10 @@ namespace GoogleStorage.Buckets
                                 string path = Path.Combine(Destination, item.name).Replace('/', Path.DirectorySeparatorChar);
 
                                 bool process = true;
-                                if (File.Exists(path)) // if the file exists confirm the overwrite
+                                if (!Force && File.Exists(path)) // if the file exists confirm the overwrite
                                 {
                                     var msg = string.Format("Do you want to overwrite the file {0}?", path);
-                                    process = Force || ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
+                                    process = ShouldContinue(msg, "Overwrite file?", ref yesToAll, ref noToAll);
                                 }
 
                                 if (process)

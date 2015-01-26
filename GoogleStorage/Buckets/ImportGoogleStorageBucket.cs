@@ -85,10 +85,10 @@ namespace GoogleStorage.Buckets
                             bool process = true;
                             // check yesToAll so we don't check the remote file if the user has already indicated they don't care
                             bool exists = api.FindObject(Bucket, file.Name).WaitForResult(CancellationToken);
-                            if (!yesToAll && !Force && exists)
+                            if (!Force && !yesToAll && exists)
                             {
                                 var msg = string.Format("Do you want to overwrite the file {0} in bucket {1}?", file.Name, Bucket);
-                                process = Force || ShouldContinue(msg, "Overwrite remote file?", ref yesToAll, ref noToAll);
+                                process = ShouldContinue(msg, "Overwrite remote file?", ref yesToAll, ref noToAll);
                             }
 
                             if (process)

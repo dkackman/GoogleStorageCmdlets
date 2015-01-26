@@ -34,16 +34,34 @@ namespace GoogleStorage
             ((IDisposable)_google).Dispose();
         }
 
+        /// <summary>
+        /// Begines the device oauth flow
+        /// </summary>
+        /// <param name="clientId">The app clientId</param>
+        /// <returns>dynamic object with the verfication_url and user_code</returns>
         public async Task<dynamic> StartAuthentication(string clientId)
         {
             return await StartAuthentication(clientId, CancellationToken.None);
         }
 
+        /// <summary>
+        /// Begines the device oauth flow
+        /// </summary>
+        /// <param name="clientId">The app clientId</param>
+        /// <param name="cancelToken">async cancellation token</param>
+        /// <returns>dynamic object with the verfication_url and user_code</returns>
         public async Task<dynamic> StartAuthentication(string clientId, CancellationToken cancelToken)
         {
             return await _google.device.code.post(cancelToken, client_id: clientId, scope: _scope);
         }
 
+        /// <summary>
+        /// Refreshes an expired access_token
+        /// </summary>
+        /// <param name="access">dynamic object with current access_token and the refresh_token</param>
+        /// <param name="config">dynamic object with clientid and client secret</param>
+        /// <param name="cancelToken">async cancellation token</param>
+        /// <returns>refeshed acess_token and the refresh_token</returns>
         public async Task<dynamic> RefreshAccessToken(dynamic access, dynamic config, CancellationToken cancelToken)
         {
             SecureString clientSecret = config.ClientSecret;
@@ -60,11 +78,8 @@ namespace GoogleStorage
         }
 
         /// <summary>
-        /// This authenticates against user and requires user interaction to authorize the unit test to access apis
-        /// This will do the auth, put the auth code on the clipboard and then open a browser with the app auth permission page
-        /// The auth code needs to be sent back to google
-        /// 
-        /// This should only need to be done once because the access token will be stored and refreshed for future test runs
+        /// Here we spin wait and poll google to see if the user has authenticated and authorized the app
+        /// Once the auth code is supplied to google, the proper access_token and refresh_token are returned here
         /// </summary>
         /// <returns></returns>
         public async Task<dynamic> WaitForConfirmation(dynamic confirmToken, string clientId, SecureString clientSecret, CancellationToken cancelToken)
