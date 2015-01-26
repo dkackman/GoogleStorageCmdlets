@@ -30,7 +30,7 @@ namespace GoogleStorage
             }
             else if (e is AccessViolationException)
             {
-                return ErrorCategory.SecurityError;
+                return ErrorCategory.PermissionDenied;
             }
             else
             {

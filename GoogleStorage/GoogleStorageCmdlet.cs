@@ -19,7 +19,7 @@ namespace GoogleStorage
             var record = new PSObject();
             foreach (var kvp in d)
             {
-                // if the value is asub expando, convert it as well
+                // if the value is itself an expando, convert it recursively
                 var value = kvp.Value is ExpandoObject ? ConvertToPSObject(kvp.Value) : kvp.Value;
 
                 record.Properties.Add(new PSVariableProperty(new PSVariable(kvp.Key, value)));

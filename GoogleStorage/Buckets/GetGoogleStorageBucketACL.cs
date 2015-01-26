@@ -4,26 +4,20 @@ using System.Management.Automation;
 
 namespace GoogleStorage.Objects
 {
-    [Cmdlet(VerbsCommon.Get, "GoogleStorageObjectACL")]
-    public class GetGoogleStorageBucketACL : GoogleStorageAuthenticatedCmdlet
+    [Cmdlet(VerbsCommon.Get, "GoogleStorageBucketACL")]
+    public class GetGoogleStorageObjectACL : GoogleStorageAuthenticatedCmdlet
     {
         /// <summary>
-        /// The bucket where the object exists
+        /// The bucket 
         /// </summary>
         [Parameter(Mandatory = true, Position = 0, ValueFromPipelineByPropertyName = true)]
         public string Bucket { get; set; }
 
         /// <summary>
-        /// The name of the object
-        /// </summary>
-        [Parameter(Mandatory = true, Position = 1, ValueFromPipelineByPropertyName = true)]
-        public string ObjectName { get; set; }
-
-        /// <summary>
         /// An entity name to retrieve the ACL for
         /// If not set all ACLs are returned
         /// </summary>
-        [Parameter(Mandatory = false, Position = 2, ValueFromPipelineByPropertyName = true)]
+        [Parameter(Mandatory = false, Position = 1, ValueFromPipelineByPropertyName = true)]
         public string EntityName { get; set; }
 
         protected override void ProcessRecord()
@@ -34,7 +28,7 @@ namespace GoogleStorage.Objects
                 {
                     if (string.IsNullOrEmpty(EntityName))
                     {
-                        dynamic acls = api.GetObjectACL(Bucket, ObjectName).WaitForResult(CancellationToken);
+                        dynamic acls = api.GetBucketACL(Bucket).WaitForResult(CancellationToken);
                         foreach (var acl in acls.items)
                         {
                             WriteDynamicObject(acl);
@@ -42,7 +36,7 @@ namespace GoogleStorage.Objects
                     }
                     else
                     {
-                        dynamic acl = api.GetObjectACL(Bucket, ObjectName, EntityName).WaitForResult(CancellationToken);
+                        dynamic acl = api.GetBucketACL(Bucket, EntityName).WaitForResult(CancellationToken);
                         WriteDynamicObject(acl);
                     }
                 }
