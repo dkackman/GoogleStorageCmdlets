@@ -27,7 +27,7 @@ namespace GoogleStorage.Objects
             {
                 using (var api = CreateApiWrapper())
                 {
-                    var item = api.GetObject(Bucket, ObjectName).WaitForResult(GetCancellationToken());
+                    var item = api.GetObject(Bucket, ObjectName).WaitForResult(CancellationToken);
 
                     WriteDynamicObject(item);
                 }

@@ -19,10 +19,9 @@ namespace GoogleStorage
 
         protected GoogleStorageApi CreateApiWrapper()
         {
-            var cancelToken = GetCancellationToken();
-            var access_token = GetAccessToken().WaitForResult(cancelToken);
+            var access_token = GetAccessToken().WaitForResult(CancellationToken);
 
-            return new GoogleStorageApi(UserAgent, access_token, cancelToken);
+            return new GoogleStorageApi(UserAgent, access_token, CancellationToken);
         }
 
         protected async Task<SecureString> GetAccessToken(bool persist = true)
@@ -45,11 +44,13 @@ namespace GoogleStorage
 
             if (DateTime.UtcNow >= access.expiry)
             {
-                var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
-                access = await oauth.RefreshAccessToken(access, GetConfig(), GetCancellationToken());
-                
-                var storage = new PersistantStorage();
-                SetPersistedVariableValue("access", access, persist || storage.ObjectExists("access")); // re-persist access token if already saved
+                using (var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope))
+                {
+                    access = await oauth.RefreshAccessToken(access, GetConfig(), CancellationToken);
+
+                    var storage = new PersistantStorage();
+                    SetPersistedVariableValue("access", access, persist || storage.ObjectExists("access")); // re-persist access token if already saved
+                }
             }
 
             return access.access_token;

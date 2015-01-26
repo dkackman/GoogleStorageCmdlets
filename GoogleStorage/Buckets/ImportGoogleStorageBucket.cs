@@ -56,7 +56,7 @@ namespace GoogleStorage.Buckets
                 using(var api = CreateApiWrapper())
                 using (var uploadPipeline = new Stage<Tuple<FileInfo, string>, Tuple<FileInfo, dynamic>>())
                 {
-                    if(!api.FindBucket(Bucket).WaitForResult(GetCancellationToken()))
+                    if(!api.FindBucket(Bucket).WaitForResult(CancellationToken))
                     {
                         throw new ItemNotFoundException(string.Format("The bucket {0} does not exist. Call Add-GoogleStorageBucket first.", Bucket));
                     }
@@ -84,7 +84,7 @@ namespace GoogleStorage.Buckets
                         {
                             bool process = true;
                             // check yesToAll so we don't check the remote file if the user has already indicated they don't care
-                            bool exists = api.FindObject(Bucket, file.Name).WaitForResult(GetCancellationToken());
+                            bool exists = api.FindObject(Bucket, file.Name).WaitForResult(CancellationToken);
                             if (!yesToAll && !Force && exists)
                             {
                                 var msg = string.Format("Do you want to overwrite the file {0} in bucket {1}?", file.Name, Bucket);

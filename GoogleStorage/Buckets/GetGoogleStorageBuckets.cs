@@ -29,7 +29,7 @@ namespace GoogleStorage.Buckets
 
                 using (var api = CreateApiWrapper())
                 {
-                    dynamic result = api.GetBuckets(project).WaitForResult(GetCancellationToken());
+                    dynamic result = api.GetBuckets(project).WaitForResult(CancellationToken);
 
                     foreach (var item in result.items)
                     {

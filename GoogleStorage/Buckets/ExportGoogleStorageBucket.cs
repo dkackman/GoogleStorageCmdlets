@@ -45,7 +45,7 @@ namespace GoogleStorage.Buckets
             {
                 using (var api = CreateApiWrapper())
                 {
-                    var contents = api.GetBucketContents(Bucket).WaitForResult(GetCancellationToken());
+                    var contents = api.GetBucketContents(Bucket).WaitForResult(CancellationToken);
 
                     IEnumerable<dynamic> items = contents.items;
 

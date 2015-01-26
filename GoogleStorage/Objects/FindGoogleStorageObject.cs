@@ -27,7 +27,7 @@ namespace GoogleStorage.Objects
             {
                 using (var api = CreateApiWrapper())
                 {
-                    bool exists = api.FindObject(Bucket, ObjectName).WaitForResult(GetCancellationToken());
+                    bool exists = api.FindObject(Bucket, ObjectName).WaitForResult(CancellationToken);
                     WriteObject(exists);
                 }
             }

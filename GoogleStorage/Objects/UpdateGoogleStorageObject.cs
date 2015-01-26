@@ -46,12 +46,12 @@ namespace GoogleStorage.Objects
             {
                 using (var api = CreateApiWrapper())
                 {
-                    if (!api.FindBucket(Bucket).WaitForResult(GetCancellationToken()))
+                    if (!api.FindBucket(Bucket).WaitForResult(CancellationToken))
                     {
                         throw new ItemNotFoundException(string.Format("The bucket {0} does not exist.", Bucket));
                     }
 
-                    if (!api.FindObject(Bucket, ObjectName).WaitForResult(GetCancellationToken()))
+                    if (!api.FindObject(Bucket, ObjectName).WaitForResult(CancellationToken))
                     {
                         throw new ItemNotFoundException(string.Format("The object {0} does not exist in bucket {1}.", ObjectName, Bucket));
                     }
@@ -60,7 +60,7 @@ namespace GoogleStorage.Objects
                     {
                         if (Force || ShouldContinue(string.Format("Set object {0}/{1} {2} to {3}?", Bucket, ObjectName, PropertyName, PropertyValue), "Update Object?"))
                         {
-                            var result = api.UpdateObjectMetaData(Bucket, ObjectName, PropertyName, PropertyValue).WaitForResult(GetCancellationToken());
+                            var result = api.UpdateObjectMetaData(Bucket, ObjectName, PropertyName, PropertyValue).WaitForResult(CancellationToken);
 
                             WriteDynamicObject(result);
                             WriteVerbose(string.Format("Object {0}/{1} {2} property set to {3}", Bucket, ObjectName, PropertyName, PropertyValue));

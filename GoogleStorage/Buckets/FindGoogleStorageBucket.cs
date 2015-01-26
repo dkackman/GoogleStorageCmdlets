@@ -21,7 +21,7 @@ namespace GoogleStorage.Buckets
             {
                 using (var api = CreateApiWrapper())
                 {
-                    var exists = api.FindBucket(Bucket).WaitForResult(GetCancellationToken());
+                    var exists = api.FindBucket(Bucket).WaitForResult(CancellationToken);
 
                     WriteObject(exists);
                 }

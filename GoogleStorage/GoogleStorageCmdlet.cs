@@ -107,14 +107,17 @@ namespace GoogleStorage
             storage.RemoveObject(name);
         }
 
-        protected CancellationToken GetCancellationToken()
+        protected CancellationToken CancellationToken
         {
-            if (_cancelTokenSource == null)
+            get
             {
-                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccessing was not called.");
-            }
+                if (_cancelTokenSource == null)
+                {
+                    throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccessing was not called.");
+                }
 
-            return _cancelTokenSource.Token;
+                return _cancelTokenSource.Token;
+            }
         }
 
         protected void Cancel()

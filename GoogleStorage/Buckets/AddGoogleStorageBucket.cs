@@ -35,7 +35,7 @@ namespace GoogleStorage.Buckets
 
                 using (var api = CreateApiWrapper())
                 {
-                    dynamic result = api.AddBucket(project, Bucket).WaitForResult(GetCancellationToken());
+                    dynamic result = api.AddBucket(project, Bucket).WaitForResult(CancellationToken);
                     WriteVerbose(string.Format("Bucket {0} added to project {1}", Bucket, project));
                 }
             }

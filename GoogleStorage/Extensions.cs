@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security;
-using System.Runtime.InteropServices;
-using System.Management.Automation.Runspaces;
 using System.Linq;
-using System.Reflection;
 using System.IO;
 using System.Web;
-using System.Diagnostics;
+using System.Reflection;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Management.Automation;
-using System.Dynamic;
+using System.Runtime.InteropServices;
+using System.Management.Automation.Runspaces;
 
 namespace GoogleStorage
 {
@@ -27,7 +24,7 @@ namespace GoogleStorage
             {
                 return ErrorCategory.InvalidOperation;
             }
-            else if (e is ItemNotFoundException)
+            else if (e is ItemNotFoundException || e is FileNotFoundException)
             {
                 return ErrorCategory.ObjectNotFound;
             }

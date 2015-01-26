@@ -30,7 +30,7 @@ namespace GoogleStorage.Buckets
                 {
                     if (ListContents)
                     {
-                        var contents = api.GetBucketContents(Bucket).WaitForResult(GetCancellationToken());
+                        var contents = api.GetBucketContents(Bucket).WaitForResult(CancellationToken);
                         foreach (var item in contents.items)
                         {
                             WriteDynamicObject(item);
@@ -38,7 +38,7 @@ namespace GoogleStorage.Buckets
                     }
                     else
                     {
-                        dynamic result = api.GetBucket(Bucket).WaitForResult(GetCancellationToken());
+                        dynamic result = api.GetBucket(Bucket).WaitForResult(CancellationToken);
                         WriteDynamicObject(result);
                     }
                 }

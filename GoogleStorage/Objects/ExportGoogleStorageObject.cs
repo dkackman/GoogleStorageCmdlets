@@ -47,7 +47,7 @@ namespace GoogleStorage.Objects
             {
                 using (var api = CreateApiWrapper())
                 {
-                    var item = api.GetObject(Bucket, ObjectName).WaitForResult(GetCancellationToken());                    
+                    var item = api.GetObject(Bucket, ObjectName).WaitForResult(CancellationToken);                    
 
                     if (ShouldProcess(string.Format("{0}/{1}", Bucket, ObjectName), "export"))
                     {
@@ -62,7 +62,7 @@ namespace GoogleStorage.Objects
 
                         if (process)
                         {
-                            api.ExportObject(new Tuple<dynamic, string>(item, path), IncludeMetaData).Wait(GetCancellationToken());
+                            api.ExportObject(new Tuple<dynamic, string>(item, path), IncludeMetaData).Wait(CancellationToken);
                             WriteObject(path);
                             WriteVerbose(string.Format("Exported {0} to {1}", item.name, path));
                         }

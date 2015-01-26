@@ -41,7 +41,7 @@ namespace GoogleStorage.Objects
                 using (
                     var api = CreateApiWrapper())
                 {
-                    if (!api.FindBucket(Bucket).WaitForResult(GetCancellationToken()))
+                    if (!api.FindBucket(Bucket).WaitForResult(CancellationToken))
                     {
                         throw new ItemNotFoundException(string.Format("The bucket {0} does not exist. Call Add-GoogleStorageBucket first.", Bucket));
                     }
@@ -51,7 +51,7 @@ namespace GoogleStorage.Objects
                         var file = new FileInfo(Source);
                         var name = string.IsNullOrEmpty(ObjectName) ? file.Name : ObjectName;
 
-                        bool exists = api.FindObject(Bucket, name).WaitForResult(GetCancellationToken());
+                        bool exists = api.FindObject(Bucket, name).WaitForResult(CancellationToken);
 
                         bool process = true;
                         if (!Force && exists)
@@ -62,7 +62,7 @@ namespace GoogleStorage.Objects
 
                         if (process)
                         {
-                            dynamic result = api.ImportObject(file, name, Bucket).WaitForResult(GetCancellationToken());
+                            dynamic result = api.ImportObject(file, name, Bucket).WaitForResult(CancellationToken);
                             WriteDynamicObject(result);
                             WriteVerbose(string.Format("Imported {0} to {1}", Source, result.name));
                         }

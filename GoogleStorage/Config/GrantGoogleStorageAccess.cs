@@ -28,31 +28,32 @@ namespace GoogleStorage.Config
             try
             {
                 var config = GetConfig();
-                var cancelToken = GetCancellationToken();
 
-                var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope);
-                var confirmToken = oauth.StartAuthentication(config.ClientId, cancelToken).WaitForResult(cancelToken);
-
-                WriteWarning("This action requires authorization with Google Storage");
-                if (!ShowBrowser)
+                using (var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope))
                 {
-                    WriteVerbose("Navigate to this Url in a web browser:");
-                    WriteObject(confirmToken.verification_url);
+                    var confirmToken = oauth.StartAuthentication(config.ClientId, CancellationToken).WaitForResult(CancellationToken);
+
+                    WriteWarning("This action requires authorization with Google Storage");
+                    if (!ShowBrowser)
+                    {
+                        WriteVerbose("Navigate to this Url in a web browser:");
+                        WriteObject(confirmToken.verification_url);
+                    }
+                    else
+                    {
+                        WriteVerbose("Opening web browser at the verifcation url.");
+                        Process.Start((string)confirmToken.verification_url);
+                    }
+
+                    WriteVerbose("Enter this code in the authorization web page to grant access of Google Storage to the Google Storage Cmdlets");
+                    WriteObject(confirmToken.user_code);
+
+                    WriteVerbose("Waiting for authorization...");
+                    var access = oauth.WaitForConfirmation(confirmToken, config.ClientId, config.ClientSecret, CancellationToken).WaitForResult(CancellationToken);
+
+                    SetPersistedVariableValue("access", access, Persist);
+                    WriteVerbose("Authorized");
                 }
-                else
-                {
-                    WriteVerbose("Opening web browser at the verifcation url.");
-                    Process.Start((string)confirmToken.verification_url);
-                }
-
-                WriteVerbose("Enter this code in the authorization web page to grant access of Google Storage to the Google Storage Cmdlets");
-                WriteObject(confirmToken.user_code);
-
-                WriteVerbose("Waiting for authorization...");
-                var access = oauth.WaitForConfirmation(confirmToken, config.ClientId, config.ClientSecret, cancelToken).WaitForResult(cancelToken);                
-
-                SetPersistedVariableValue("access", access, Persist);
-                WriteVerbose("Authorized");
             }
             catch (Exception e)
             {
