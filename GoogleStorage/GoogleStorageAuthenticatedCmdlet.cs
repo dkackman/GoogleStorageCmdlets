@@ -44,9 +44,10 @@ namespace GoogleStorage
 
             if (DateTime.UtcNow >= access.expiry)
             {
-                using (var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope))
+                var config = GetConfig();
+                using (var oauth = new GoogleOAuth2(config.ClientId, GoogleStorageApi.AuthScope))
                 {
-                    access = await oauth.RefreshAccessToken(access, GetConfig(), CancellationToken);
+                    access = await oauth.RefreshAccessToken(access.refresh_token, config.ClientSecret, CancellationToken);
 
                     var storage = new PersistantStorage();
                     SetPersistedVariableValue("access", access, persist || storage.ObjectExists("access")); // re-persist access token if already saved

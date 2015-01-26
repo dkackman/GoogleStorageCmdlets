@@ -11,21 +11,26 @@ using DynamicRestProxy.PortableHttpClient;
 namespace GoogleStorage
 {
     /// <summary>
-    /// Helper class to deal with google oauth for unit testing
-    /// The first time a machine authenticates user interaction is required
-    /// Subsequent unit test runs will use a stored token that will refresh with google
+    /// Helper class to deal with google oauth2 device flow:
+    /// https://developers.google.com/accounts/docs/OAuth2ForDevices?csw=1
+    /// 1) Initiate authorization
+    /// 2) Direct user to enter code at specific url on any machine
+    /// 3) Poll google until it indicates that auth has been granted
     /// </summary>
     public sealed class GoogleOAuth2 : IDisposable
     {
+        private string _clientId;
         // the set of scopes to authorize
         private string _scope;
         private dynamic _google;
 
-        public GoogleOAuth2(string scope)
+        public GoogleOAuth2(string clientId, string scope)
         {
+            Debug.Assert(!string.IsNullOrEmpty(clientId));
             Debug.Assert(!string.IsNullOrEmpty(scope));
 
             _google = new DynamicRestClient("https://accounts.google.com/o/oauth2/");
+            _clientId = clientId;
             _scope = scope;
         }
 
@@ -35,24 +40,26 @@ namespace GoogleStorage
         }
 
         /// <summary>
-        /// Begines the device oauth flow
+        /// Begins the device oauth flow
         /// </summary>
         /// <param name="clientId">The app clientId</param>
-        /// <returns>dynamic object with the verfication_url and user_code</returns>
-        public async Task<dynamic> StartAuthentication(string clientId)
+        /// <returns>dynamic object with the verfication_url, device_code, and user_code.
+        /// This should be passed back to WaitForFonfirmation</returns>
+        public async Task<dynamic> StartAuthentication()
         {
-            return await StartAuthentication(clientId, CancellationToken.None);
+            return await StartAuthentication(CancellationToken.None);
         }
 
         /// <summary>
-        /// Begines the device oauth flow
+        /// Begins the device oauth flow
         /// </summary>
         /// <param name="clientId">The app clientId</param>
         /// <param name="cancelToken">async cancellation token</param>
-        /// <returns>dynamic object with the verfication_url and user_code</returns>
-        public async Task<dynamic> StartAuthentication(string clientId, CancellationToken cancelToken)
+        /// <returns>dynamic object with the verfication_url, device_code, and user_code.
+        /// This should be passed back to WaitForFonfirmation</returns>
+        public async Task<dynamic> StartAuthentication(CancellationToken cancelToken)
         {
-            return await _google.device.code.post(cancelToken, client_id: clientId, scope: _scope);
+            return await _google.device.code.post(cancelToken, client_id: _clientId, scope: _scope);
         }
 
         /// <summary>
@@ -61,14 +68,15 @@ namespace GoogleStorage
         /// <param name="access">dynamic object with current access_token and the refresh_token</param>
         /// <param name="config">dynamic object with clientid and client secret</param>
         /// <param name="cancelToken">async cancellation token</param>
-        /// <returns>refeshed acess_token and the refresh_token</returns>
-        public async Task<dynamic> RefreshAccessToken(dynamic access, dynamic config, CancellationToken cancelToken)
+        /// <returns>new acess_token and the refresh_token</returns>
+        public async Task<dynamic> RefreshAccessToken(string refresh_token, SecureString clientSecret, CancellationToken cancelToken)
         {
-            SecureString clientSecret = config.ClientSecret;
+            Debug.Assert(!string.IsNullOrEmpty(refresh_token));
 
-            var response = await _google.token.post(cancelToken, client_id: config.ClientId, client_secret: clientSecret.ToUnsecureString(), refresh_token: access.refresh_token, grant_type: "refresh_token");
+            var response = await _google.token.post(cancelToken, client_id: _clientId, client_secret: clientSecret.ToUnsecureString(), refresh_token: refresh_token, grant_type: "refresh_token");
 
-            response.refresh_token = access.refresh_token; // the new access token doesn't have a new refresh token so move our current one here for long term storage
+            response.refresh_token = refresh_token; // the new access token doesn't have a new refresh token so move our current one here for long term storage
+            // remember when the token expires so we know when to refresh it
             response.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(response.expires_in);
 
             // replace the plain text access_token with a securestring
@@ -82,7 +90,7 @@ namespace GoogleStorage
         /// Once the auth code is supplied to google, the proper access_token and refresh_token are returned here
         /// </summary>
         /// <returns></returns>
-        public async Task<dynamic> WaitForConfirmation(dynamic confirmToken, string clientId, SecureString clientSecret, CancellationToken cancelToken)
+        public async Task<dynamic> WaitForConfirmation(dynamic confirmToken, SecureString clientSecret, CancellationToken cancelToken)
         {
             long expiration = confirmToken.expires_in;
             long interval = confirmToken.interval;
@@ -95,11 +103,12 @@ namespace GoogleStorage
                 Thread.Sleep((int)interval * 1000);
                 cancelToken.ThrowIfCancellationRequested();
 
-                dynamic tokenResponse = await _google.token.post(cancelToken, client_id: clientId, client_secret: clientSecret.ToUnsecureString(), code: confirmToken.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
+                dynamic tokenResponse = await _google.token.post(cancelToken, client_id: _clientId, client_secret: clientSecret.ToUnsecureString(), code: confirmToken.device_code, grant_type: "http://oauth.net/grant_type/device/1.0");
                 try
                 {
                     if (tokenResponse.access_token != null)
                     {
+                        // remember when the token expires so we know when to refresh it
                         tokenResponse.expiry = DateTime.UtcNow + TimeSpan.FromSeconds(tokenResponse.expires_in);
                         // replace the plain text access_token with a securestring
                         tokenResponse.access_token = ((string)tokenResponse.access_token).ToSecureString();

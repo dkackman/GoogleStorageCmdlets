@@ -29,9 +29,9 @@ namespace GoogleStorage.Config
             {
                 var config = GetConfig();
 
-                using (var oauth = new GoogleOAuth2(GoogleStorageApi.AuthScope))
+                using (var oauth = new GoogleOAuth2(config.ClientId, GoogleStorageApi.AuthScope))
                 {
-                    var confirmToken = oauth.StartAuthentication(config.ClientId, CancellationToken).WaitForResult(CancellationToken);
+                    var confirmToken = oauth.StartAuthentication(CancellationToken).WaitForResult(CancellationToken);
 
                     WriteWarning("This action requires authorization with Google Storage");
                     if (!ShowBrowser)
@@ -49,7 +49,7 @@ namespace GoogleStorage.Config
                     WriteObject(confirmToken.user_code);
 
                     WriteVerbose("Waiting for authorization...");
-                    var access = oauth.WaitForConfirmation(confirmToken, config.ClientId, config.ClientSecret, CancellationToken).WaitForResult(CancellationToken);
+                    var access = oauth.WaitForConfirmation(confirmToken, config.ClientSecret, CancellationToken).WaitForResult(CancellationToken);
 
                     SetPersistedVariableValue("access", access, Persist);
                     WriteVerbose("Authorized");
