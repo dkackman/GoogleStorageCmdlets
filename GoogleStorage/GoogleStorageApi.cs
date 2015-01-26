@@ -65,6 +65,11 @@ namespace GoogleStorage
             return await _googleStorage.b(bucket).o(objectName).get(CancellationToken);
         }
 
+        public async Task<dynamic> GetObjectACL(string bucket, string objectName)
+        {
+            return await _googleStorage.b(bucket).o(objectName).acl.get(CancellationToken);
+        }
+
         public async Task RemoveObject(string bucket, string objectName)
         {
             await _googleStorage.b(bucket).o(objectName).delete(CancellationToken);

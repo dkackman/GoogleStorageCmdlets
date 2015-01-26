@@ -120,19 +120,6 @@ namespace GoogleStorage
             }
         }
 
-        protected void Cancel()
-        {
-            if (_cancelTokenSource == null)
-            {
-                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccessing was not called.");
-            }
-
-            if (!_cancelTokenSource.IsCancellationRequested)
-            {
-                _cancelTokenSource.Cancel();
-            }
-        }
-
         protected override void BeginProcessing()
         {
             Debug.Assert(_cancelTokenSource == null);
@@ -157,7 +144,16 @@ namespace GoogleStorage
         protected override void StopProcessing()
         {
             WriteVerbose("Cancelling...");
-            Cancel();
+
+            if (_cancelTokenSource == null)
+            {
+                throw new NullReferenceException("CancellationTokenSource is null. The base class BeginProccessing was not called.");
+            }
+
+            if (!_cancelTokenSource.IsCancellationRequested)
+            {
+                _cancelTokenSource.Cancel();
+            }
         }
 
         protected void HandleException(Exception e)
