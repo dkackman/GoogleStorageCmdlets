@@ -14,6 +14,14 @@ namespace GoogleStorage
 {
     static class Extensions
     {
+        public static void ThrowIfCancelled(this AggregateException e)
+        {
+            if (e.InnerExceptions.OfType<OperationCanceledException>().Any())
+            {
+                throw e.InnerExceptions.OfType<OperationCanceledException>().First();
+            }
+        }
+
         public static ErrorCategory GetCategory(this Exception e)
         {
             if (e is HaltCommandException || e is PipelineStoppedException || e is OperationCanceledException)

@@ -25,20 +25,12 @@ namespace DynamicRestProxy.PortableHttpClient
             Debug.Assert(_methods.ContainsKey(verb), "unrecognized verb. check the BinderExtensions _verbs array");
 
             var method = _methods[verb];
-            var request = new HttpRequestMessage()
+            return new HttpRequestMessage()
             {
                 Method = method,
-                RequestUri = MakeUri(method, namedArgs)
+                RequestUri = MakeUri(method, namedArgs),
+                Content = CreateContent(method, unnamedArgs, namedArgs)
             };
-
-            // filter out a cancellationtoken if passed
-            var content = CreateContent(method, unnamedArgs, namedArgs);
-            if (content != null)
-            {
-                request.Content = content;
-            }
-
-            return request;
         }
 
         private Uri MakeUri(HttpMethod method, IEnumerable<KeyValuePair<string, object>> namedArgs)

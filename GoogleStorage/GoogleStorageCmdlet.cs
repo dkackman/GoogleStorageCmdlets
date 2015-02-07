@@ -13,21 +13,21 @@ namespace GoogleStorage
 
         protected void WriteDynamicObject(dynamic o)
         {
-            var psObject = ConvertToPSObject(o);
+            var psObject = ConvertToPSObject(o as IDictionary<string, object>);
             WriteObject(psObject);
         }
 
-        private static PSObject ConvertToPSObject(dynamic o)
+        private static PSObject ConvertToPSObject(IDictionary<string, object> o)
         {
-            var d = o as IDictionary<string, object>;
-            Debug.Assert(d != null);
+            if (o == null)
+                return null;
 
             var record = new PSObject();
-            foreach (var kvp in d)
+            foreach (var kvp in o)
             {
-                // if the value is itself an expando, convert it recursively
-                var value = kvp.Value is ExpandoObject ? ConvertToPSObject(kvp.Value) : kvp.Value;
-                
+                // if the value is itself an IDictionary, convert it recursively
+                var value = kvp.Value is IDictionary<string, object> ? ConvertToPSObject(kvp.Value as IDictionary<string, object>) : kvp.Value;
+
                 record.Properties.Add(new PSNoteProperty(kvp.Key, value));
             }
 

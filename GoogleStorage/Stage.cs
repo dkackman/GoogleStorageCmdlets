@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
@@ -38,8 +39,16 @@ namespace GoogleStorage
                             TOutput output = await func(item);
                             Output.Add(output);
                         }
+                        catch (OperationCanceledException)
+                        {
+                            throw; // if something was cancelled rethrow that
+                        }
                         catch (AggregateException e)
                         {
+                            // if any of the child exceptions indicate cancellation just throw the first one
+                            e.ThrowIfCancelled();
+
+                            // everything else, log for upstream inspection
                             foreach (var ex in e.InnerExceptions)
                             {
                                 Errors.Add(Tuple.Create(item, ex));
@@ -49,6 +58,7 @@ namespace GoogleStorage
                         {
                             Errors.Add(Tuple.Create(item, e));
                         }
+
                         cancelToken.ThrowIfCancellationRequested();
                     }
                 };
@@ -64,7 +74,7 @@ namespace GoogleStorage
                 {
                     Task.WaitAll(tasks, cancelToken);
                     Output.CompleteAdding(); // this signals the calling thread that all the work is done
-                                             // because it will stop trying to iterate on the blocking enuemration
+                    // because it will stop trying to iterate on the blocking enuemration
                 }, cancelToken);
         }
 
